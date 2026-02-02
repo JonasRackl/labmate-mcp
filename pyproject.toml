@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "labmate-mcp"
-version = "7.0.0"
+version = "7.2.0"
 description = "Your AI lab companion — 78 MCP tools from literature search to benchwork to publication"
 readme = "README.md"
 license = {text = "MIT"}

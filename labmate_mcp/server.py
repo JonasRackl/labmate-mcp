@@ -43,6 +43,13 @@ from labmate_mcp.bench import (
     lookup_amino_acid as _lookup_amino_acid,
     lookup_nmr_solvent as _lookup_nmr_solvent,
     AMINO_ACIDS,
+    # v7.1.0 additions
+    lookup_lab_tips as _lookup_lab_tips,
+    lookup_safety as _lookup_safety,
+    # v7.2.0 additions
+    lookup_rxn_dev_checklist as _lookup_rxn_dev_checklist,
+    get_all_checklist_sections as _get_all_checklist_sections,
+    REACTION_DEV_CHECKLIST,
 )
 from labmate_mcp.chemistry import (
     validate_cas as _validate_cas,
@@ -5099,6 +5106,131 @@ async def get_thesis_guide(params: ThesisGuideInput) -> str:
         lines.append("\n**Common mistakes:**")
         for m in result["common_mistakes"]:
             lines.append(f"  ✗ {m}")
+    return "\n".join(lines)
+
+
+# =============================================================================
+# v7.1.0 — Lab Tips & Safety Cards
+# =============================================================================
+
+
+class LookupLabTipsInput(BaseModel):
+    """Search practical lab tips."""
+    query: str = Field(description="Keyword, category, or topic (e.g. 'grignard', 'emulsion', 'moisture', 'safety', 'workup', 'TLC')")
+
+
+@mcp.tool()
+async def lookup_lab_tips(params: LookupLabTipsInput) -> str:
+    """Search practical lab tips and 'Law of the Lab' wisdom. 35 tips across 9 categories: reaction_setup (Grignard initiation, degassing, syringe technique, scale-up, molecular sieves), temperature_control (cooling baths, cryogenic technique, kinetic vs thermodynamic), moisture_sensitive (Schlenk line, solvent drying guide), workup_tips (breaking emulsions, drying agents, rotovap), purification_tips, analytical_tips (HRMS ionization), safety (azides, peroxides, Swern, pyrophorics, ozone, H2), common_mistakes (reagent quality, concentration guidelines, TLC technique, base equivalents), time_savers (parallel TLC, crude NMR, overnight setup)."""
+    results = _lookup_lab_tips(params.query)
+    if not results:
+        return f"No tips found for '{params.query}'. Try: grignard, emulsion, moisture, cooling, safety, azide, swern, TLC, concentration, syringe, schlenk, drying, column, rotovap, scale-up, or a category name."
+    lines = [f"## Lab Tips — '{params.query}' ({len(results)} found)\n"]
+    for tip in results:
+        lines.append(f"### {tip['title']}")
+        lines.append(tip['tip'])
+        if tip.get('details'):
+            if isinstance(tip['details'], list):
+                for d in tip['details']:
+                    lines.append(f"  • {d}")
+            elif isinstance(tip['details'], dict):
+                for k, v in tip['details'].items():
+                    if isinstance(v, list):
+                        lines.append(f"  **{k}:**")
+                        for item in v:
+                            lines.append(f"    • {item}")
+                    else:
+                        lines.append(f"  **{k}:** {v}")
+            else:
+                lines.append(f"  {tip['details']}")
+        lines.append("")
+    return "\n".join(lines)
+
+
+class LookupSafetyInput(BaseModel):
+    """Search hazardous reagent safety cards."""
+    query: str = Field(description="Reagent name or keyword (e.g. 'LAH', 'n-BuLi', 'diazomethane', 'HF', 'azide', 'OsO4', 'Pd/C', 'NaH', 't-BuLi')")
+
+
+@mcp.tool()
+async def lookup_safety_card(params: LookupSafetyInput) -> str:
+    """Look up hazardous reagent safety cards. 9 cards covering: n-BuLi, t-BuLi, LAH (LiAlH4), NaH, diazomethane (CH2N2), OsO4, HF, NaN3, Pd/C. Each card: hazards, handling protocol, quench procedure, first aid, storage. Essential quick-reference before working with dangerous reagents."""
+    results = _lookup_safety(params.query)
+    if not results:
+        return f"No safety card found for '{params.query}'. Available cards: n-BuLi, t-BuLi, LAH, NaH, diazomethane, OsO4, HF, NaN3, Pd/C."
+    lines = []
+    for card in results:
+        lines.append(f"## ⚠️ Safety Card: {card['reagent']}\n")
+        lines.append(f"**Hazards:** {card['hazards']}")
+        lines.append(f"**Handling:** {card['handling']}")
+        if card.get('quench'):
+            lines.append(f"**Quench:** {card['quench']}")
+        if card.get('first_aid'):
+            lines.append(f"**First aid:** {card['first_aid']}")
+        if card.get('storage'):
+            lines.append(f"**Storage:** {card['storage']}")
+        lines.append("")
+    return "\n".join(lines)
+
+
+# =============================================================================
+# v7.2.0 — Reaction Development Checklist
+# =============================================================================
+
+
+class RxnDevChecklistInput(BaseModel):
+    """Search the reaction development checklist."""
+    query: str = Field(description="Section name, keyword, or topic. Sections: 'take_stock', 'kinetics', 'mechanism', 'optimisation', 'catalysis', 'scope', 'applications'. Keywords: 'KIE', 'Hammett', 'reproducible', 'selectivity', 'TON', 'bioconjugation', etc. Use 'all' for overview.")
+
+
+@mcp.tool()
+async def lookup_rxn_dev_checklist(params: RxnDevChecklistInput) -> str:
+    """Search the Reaction Development Checklist — a comprehensive guide for methodology studies. Based on Kerr, Jenkinson, Sheridan & Sparr, Chem. Soc. Rev. 2025 (DOI: 10.1039/D4CS01046A). 7 sections with actionable questions and practical tips: Take Stock (product characterisation, mass balance, reproducibility, minimal retron), Kinetics & Thermodynamics (rate laws, driving forces, equilibrium), Mechanism (KIE, radical clocks, Hammett, Stern-Volmer, computation), Optimisation (yield, selectivity, DoE, efficiency, sustainability), Catalysis (active species, enantioselectivity, TON), Scope (substrate diversity, FG tolerance, robustness screen, Mayr scale), Applications (total synthesis, LSF, skeletal editing, bioconjugation, materials)."""
+    if params.query.lower().strip() == "all":
+        lines = ["## Reaction Development Checklist — Overview",
+                 "_Based on Kerr, Jenkinson, Sheridan & Sparr, Chem. Soc. Rev. 2025_\n"]
+        for key, section in REACTION_DEV_CHECKLIST.items():
+            lines.append(f"### {section['icon']} {section['name']}")
+            lines.append(section["summary"])
+            for q in section["questions"]:
+                lines.append(f"  • {q['header']}")
+            lines.append("")
+        lines.append("Search a specific section or keyword for detailed checks and tips.")
+        return "\n".join(lines)
+
+    results = _lookup_rxn_dev_checklist(params.query)
+    if not results:
+        sections = ", ".join(_get_all_checklist_sections())
+        return f"No matches for '{params.query}'. Sections: {sections}. Try keywords like: KIE, Hammett, reproducible, selectivity, scope, TON, bioconjugation, sustainability, DoE, robustness, late-stage."
+
+    lines = []
+    for r in results:
+        if r["match_type"] == "section":
+            lines.append(f"## {r['icon']} {r['section']}")
+            lines.append(f"_{r['summary']}_\n")
+            for q in r["questions"]:
+                lines.append(f"### {q['header']}")
+                for check in q.get("checks", []):
+                    lines.append(f"  ☐ {check}")
+                for check in q.get("extra_checks", []):
+                    lines.append(f"  ☐ {check}")
+                if q.get("tips"):
+                    lines.append("  **Tips:**")
+                    for tip in q["tips"]:
+                        lines.append(f"  💡 {tip}")
+                lines.append("")
+        else:
+            lines.append(f"### {r['icon']} {r['section']} → {r['header']}")
+            for check in r.get("checks", []):
+                lines.append(f"  ☐ {check}")
+            for check in r.get("extra_checks", []):
+                lines.append(f"  ☐ {check}")
+            if r.get("tips"):
+                lines.append("  **Tips:**")
+                for tip in r["tips"]:
+                    lines.append(f"  💡 {tip}")
+            lines.append("")
+
     return "\n".join(lines)
 
 

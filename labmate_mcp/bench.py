@@ -2501,6 +2501,528 @@ _nr("Oppolzer Sultam",
     related="Evans, Myers, Enders",
     functional_groups="acryloyl, aldehyde, Diels-Alder, sultam")
 
+
+
+# --- C-C Bond Formation: Radical & Miscellaneous (v7.1.0) ---
+
+_nr("Glaser Coupling",
+    aliases=["Glaser-Eglinton", "Eglinton coupling"],
+    category="C-C Bond Formation", type_="Oxidative Coupling",
+    summary="Cu-mediated oxidative homo-coupling of terminal alkynes to form 1,3-diynes (butadiynes).",
+    conditions="CuCl (10-100 mol%), TMEDA, O2 atmosphere, CH2Cl2 or pyridine, RT-60°C. Eglinton variant: Cu(OAc)2, pyridine, MeOH.",
+    substrate="Terminal alkynes → symmetrical 1,3-diynes.",
+    limitations="Homodimerization only (for cross-coupling see Cadiot-Chodkiewicz). Requires O2 as terminal oxidant.",
+    mechanism="Cu(I) forms copper acetylide → oxidation to Cu(II) → reductive elimination or radical pathway → diyne + Cu(I).",
+    refs="Glaser, Ber. Dtsch. Chem. Ges. 1869, 2, 422. Eglinton, J. Chem. Soc. 1959, 889.",
+    related="Cadiot-Chodkiewicz, Sonogashira",
+    functional_groups="terminal alkyne, diyne")
+
+_nr("Cadiot-Chodkiewicz Coupling",
+    aliases=["Cadiot-Chodkiewicz"],
+    category="C-C Bond Formation", type_="Cross-Coupling",
+    summary="Cu-catalyzed cross-coupling of a terminal alkyne with a 1-bromoalkyne to form unsymmetrical 1,3-diynes.",
+    conditions="CuCl (5-10 mol%), NH2OH·HCl, EtNH2 or n-BuNH2, MeOH/H2O, 0°C-RT.",
+    substrate="Terminal alkyne + 1-bromoalkyne → unsymmetrical 1,3-diynes.",
+    limitations="Requires pre-formed bromoalkyne. Some homocoupling side product. Sensitive to conditions.",
+    mechanism="Cu(I) acetylide + bromoalkyne → oxidative addition → reductive elimination → cross-coupled diyne.",
+    refs="Cadiot, Chodkiewicz, in Chemistry of Acetylenes, Marcel Dekker, 1969, 597.",
+    related="Glaser, Sonogashira",
+    functional_groups="terminal alkyne, bromoalkyne, diyne")
+
+_nr("Pauson-Khand Reaction",
+    aliases=["PKR"],
+    category="C-C Bond Formation", type_="Cycloaddition",
+    summary="[2+2+1] Cycloaddition of an alkyne, alkene, and CO (from Co2(CO)8) to form cyclopentenones.",
+    conditions="Co2(CO)8 (stoich. or cat.), toluene or DME, 60-130°C. Catalytic: Mo(CO)6, Rh catalysts. Promoters: TMANO, NMO, or CyNH2 (amine N-oxide).",
+    substrate="Enyne substrates (intramolecular) or alkyne + alkene (intermolecular) → cyclopentenones.",
+    limitations="Intermolecular version requires excess alkene. Regioselectivity can be poor. Steric bias needed for selectivity.",
+    mechanism="Co2(CO)8 + alkyne → alkyne-Co complex → alkene insertion → CO insertion → reductive elimination → cyclopentenone.",
+    refs="Khand, Pauson, J. Chem. Soc., Chem. Commun. 1971, 36.",
+    related="Diels-Alder, Ring-Closing Metathesis",
+    functional_groups="alkyne, alkene, cyclopentenone, enyne")
+
+_nr("Catellani Reaction",
+    aliases=["Catellani"],
+    category="C-C Bond Formation", type_="Pd-Catalyzed C-H Activation",
+    summary="Pd/norbornene-catalyzed ortho C-H functionalization of aryl halides followed by ipso termination.",
+    conditions="Pd(OAc)2 (5-10 mol%), norbornene (1-2 equiv), base (Cs2CO3, K2CO3), DMF, 80-100°C. ortho electrophile + ipso termination agent.",
+    substrate="ArI + ortho-electrophile (RX, ArX) + ipso-terminating agent (alkene, boronic acid) → 1,2,3-trisubstituted arenes.",
+    limitations="Requires iodoarenes (most reactive). Norbornene must be ejected. Limited to specific combinations of ortho/ipso partners.",
+    mechanism="Pd(0) oxidative addition to ArI → norbornene carbopalladation → ortho C-H palladation → ortho functionalization → β-carbon elimination (norbornene ejection) → ipso functionalization.",
+    refs="Catellani, Chiusoli, J. Organomet. Chem. 1988, 346, C27.",
+    related="Heck, Buchwald-Hartwig",
+    functional_groups="aryl iodide, norbornene, C-H activation")
+
+_nr("Cross-Metathesis",
+    aliases=["CM", "olefin cross-metathesis"],
+    category="C-C Bond Formation", type_="Metathesis",
+    summary="Ru-catalyzed exchange of alkylidene units between two different olefins to form new C=C bonds.",
+    conditions="Grubbs 2nd gen. or Hoveyda-Grubbs 2nd gen. (2-5 mol%), CH2Cl2 or toluene, 40°C, 2-24 h. Often one partner in excess (2-5 equiv).",
+    substrate="Two terminal or internal olefins → cross-product. E-selectivity typical; Z-selective catalysts (Schrock/Hoveyda) available.",
+    limitations="Statistical mixtures (homo- + cross-). Olefin categorization (Grubbs) predicts selectivity: Type I (fast) > Type II > Type III (spectator). Acrylates and styrenes are Type II.",
+    mechanism="Ru-carbene [2+2] cycloaddition → metallacyclobutane → cycloreversion → new olefin + new Ru-carbene. Reversible — remove ethylene to drive equilibrium.",
+    refs="Chatterjee, Choi, Sanders, Grubbs, JACS 2003, 125, 11360.",
+    related="Ring-Closing Metathesis, Grubbs Metathesis, Olefin Metathesis",
+    functional_groups="terminal olefin, internal olefin, acrylate")
+
+_nr("Meerwein Arylation",
+    aliases=["Meerwein reaction"],
+    category="C-C Bond Formation", type_="Radical Addition",
+    summary="Cu-catalyzed addition of aryldiazonium salts to electron-poor alkenes via aryl radical intermediates.",
+    conditions="ArN2+ (from aniline + NaNO2/HCl), CuCl2 (cat.), acetone/H2O, 0-25°C. Modern: Cu(OTf)2, DMSO.",
+    substrate="Aryldiazonium salts + activated alkenes (acrylates, acrylonitrile, styrene) → β-aryl products (often as chlorides).",
+    limitations="Requires electron-poor olefins. Diazonium salts can be unstable/explosive. Moderate yields.",
+    mechanism="Cu(I) reduces ArN2+ → Ar• radical + N2 → radical addition to alkene → atom transfer from CuCl2 → product + Cu(I).",
+    refs="Meerwein, Büchner, van Emster, J. Prakt. Chem. 1939, 152, 237.",
+    related="Sandmeyer, Heck, Minisci",
+    functional_groups="diazonium, acrylate, radical")
+
+# --- Pericyclic Reactions (v7.1.0) ---
+
+_nr("Alder-Ene Reaction",
+    aliases=["ene reaction", "Alder ene"],
+    category="Pericyclic", type_="Ene Reaction",
+    summary="Concerted [1,5]-sigmatropic shift of an allylic C-H bond to a dienophile (enophile) with formation of a new C-C bond and migration of the double bond.",
+    conditions="Thermal: 200-400°C (retro-ene lower). Lewis acid catalyzed: BF3·Et2O, AlCl3, SnCl4, or chiral bisoxazoline-Cu complexes, -78°C to RT.",
+    substrate="Alkene with allylic H (ene) + electron-poor alkene, aldehyde, or imine (enophile). Cis rule: H must be suprafacial to π-system.",
+    limitations="Thermal conditions harsh. Regiochemistry can be complex. Carbonyl-ene more synthetically useful than C=C ene.",
+    mechanism="Concerted suprafacial [4πs+2σs] 6-electron pericyclic. Transition state resembles Diels-Alder but with C-H bond breaking instead of second C-C bond.",
+    refs="Alder, Pascher, Schmidt, Ber. Dtsch. Chem. Ges. 1943, 76, 27. Mikami, Shimizu, Chem. Rev. 1992, 92, 1021.",
+    related="Diels-Alder, Cope Rearrangement, Conia-ene",
+    functional_groups="alkene, allylic hydrogen, aldehyde")
+
+_nr("Cope Rearrangement",
+    aliases=["Cope"],
+    category="Pericyclic", type_="Sigmatropic Rearrangement",
+    summary="[3,3]-Sigmatropic rearrangement of 1,5-dienes. Chair-like transition state provides high stereoselectivity.",
+    conditions="Thermal: 150-300°C (sealed tube). Oxy-Cope variant: KH, 18-crown-6, THF, 0°C-RT (dramatically accelerated by alkoxide anion).",
+    substrate="1,5-Dienes → isomeric 1,5-dienes. Oxy-Cope: 3-hydroxy-1,5-dienes → δ,ε-unsaturated carbonyl after tautomerization.",
+    limitations="High temperature needed for parent reaction. Equilibrium controlled — product must be thermodynamically favored. Ring strain can drive forward.",
+    mechanism="Concerted [3,3]-sigmatropic through chair-like TS. Suprafacial on both components. Oxy-Cope: anionic acceleration (10^10-10^17 rate increase).",
+    refs="Cope, Hardy, JACS 1940, 62, 441. Evans, Golob, JACS 1975, 97, 4765 (oxy-Cope).",
+    related="Claisen Rearrangement, Ireland-Claisen, Oxy-Cope",
+    functional_groups="1,5-diene, allyl vinyl ether")
+
+_nr("Oxy-Cope Rearrangement",
+    aliases=["oxy-Cope", "anionic oxy-Cope"],
+    category="Pericyclic", type_="Sigmatropic Rearrangement",
+    summary="[3,3]-Sigmatropic rearrangement of 3-hydroxy-1,5-dienes. Anionic variant (deprotonation with KH) accelerates rate by 10^10-10^17.",
+    conditions="Anionic oxy-Cope: KH (excess), 18-crown-6, THF, 0°C-RT, 1-4 h. Neutral: 150-250°C (slow, low yield).",
+    substrate="3-Hydroxy-1,5-dienes → enolate (tautomerizes to δ,ε-unsaturated ketone or aldehyde upon workup).",
+    limitations="Requires accessible 3-hydroxy-1,5-diene. Chair-like TS determines stereochemistry. KH requires dry conditions.",
+    mechanism="Alkoxide [3,3]-sigmatropic shift through chair TS → dienolate → protonation on workup → carbonyl product. Rate acceleration from charge delocalization in TS.",
+    refs="Evans, Golob, JACS 1975, 97, 4765. Paquette, Tetrahedron 1997, 53, 13971.",
+    related="Cope Rearrangement, Claisen Rearrangement",
+    functional_groups="1,5-dien-3-ol, enolate, ketone")
+
+_nr("Eschenmoser-Claisen Rearrangement",
+    aliases=["Eschenmoser-Claisen"],
+    category="Pericyclic", type_="Sigmatropic Rearrangement",
+    summary="[3,3]-Sigmatropic rearrangement of allylic alcohols via N,O-ketene acetal intermediates to give γ,δ-unsaturated amides.",
+    conditions="Allylic alcohol + MeC(OMe)2NMe2 (Eschenmoser salt/dimethylacetamide dimethyl acetal), toluene or xylene, 80-140°C, 2-16 h.",
+    substrate="Allylic alcohols → γ,δ-unsaturated N,N-dimethylamides.",
+    limitations="High temperatures needed. E/Z selectivity depends on substrate. Bulky substituents slow reaction.",
+    mechanism="Allylic alcohol + ortho-amide → exchange → N,O-ketene acetal → [3,3]-sigmatropic rearrangement through chair TS → γ,δ-unsaturated amide.",
+    refs="Wick, Felix, Sternbach, Eschenmoser, Helv. Chim. Acta 1964, 47, 2425.",
+    related="Claisen Rearrangement, Ireland-Claisen, Johnson-Claisen",
+    functional_groups="allylic alcohol, amide, ketene acetal")
+
+# --- Oxidations (v7.1.0) ---
+
+_nr("Fleming-Tamao Oxidation",
+    aliases=["Tamao oxidation", "Tamao-Fleming"],
+    category="Oxidation", type_="C-Si to C-OH Conversion",
+    summary="Oxidative cleavage of C-Si bonds to give alcohols. Converts silyl groups into hydroxyl groups with retention of configuration.",
+    conditions="Tamao: PhMe2Si → OH using H2O2/KF/KHCO3 in THF/MeOH or m-CPBA/BF3·Et2O, then H2O2/KF. Fleming: PhMe2Si → OH using Hg(OAc)2/AcOH then H2O2/KF/KHCO3.",
+    substrate="Allylsilanes, vinylsilanes, alkylsilanes with at least one heteroatom on Si (OR, F, or aryl) → corresponding alcohols.",
+    limitations="Requires activating group on Si (fluoride, alkoxy). PhMe2Si needs activation (protodesilylation or Hg). Steric bulk can slow reaction.",
+    mechanism="Si activated by F⁻ or electrophile → pentacoordinate Si → nucleophilic oxidation (like Baeyer-Villiger on Si) → migration with retention → silanol → hydrolysis → alcohol.",
+    refs="Tamao, Ishida, Kumada, JOC 1983, 48, 2120. Fleming, Henning, Plaut, J. Chem. Soc., Chem. Commun. 1984, 29.",
+    related="Brown hydroboration, Wacker",
+    functional_groups="silane, alcohol, C-Si bond")
+
+_nr("Saegusa-Ito Oxidation",
+    aliases=["Saegusa oxidation", "Saegusa-Ito"],
+    category="Oxidation", type_="Enone Formation",
+    summary="Pd(II)-mediated oxidation of silyl enol ethers to α,β-unsaturated carbonyl compounds (enones/enals).",
+    conditions="Silyl enol ether + Pd(OAc)2 (1 equiv or cat. with co-oxidant), DMSO or MeCN, RT-60°C. Catalytic: Pd(OAc)2 (5-10 mol%) with allyl carbonate or O2/CuCl2.",
+    substrate="Silyl enol ethers (TMS, TBS) → α,β-unsaturated ketones. Regioselective — unsaturation appears at the enol ether position.",
+    limitations="Stoichiometric Pd traditionally needed (expensive). Catalytic variants developing. Over-oxidation possible.",
+    mechanism="Pd(II) electrophilic attack on silyl enol ether → oxypalladation → β-hydride elimination → enone + Pd(0) (+ H-X). Re-oxidation of Pd(0) for catalytic cycle.",
+    refs="Ito, Hirao, Saegusa, JOC 1978, 43, 1011.",
+    related="Wacker Oxidation, TEMPO Oxidation",
+    functional_groups="silyl enol ether, enone, ketone")
+
+_nr("Riley Oxidation",
+    aliases=["Riley", "SeO2 oxidation"],
+    category="Oxidation", type_="Allylic Oxidation",
+    summary="SeO2-mediated allylic oxidation of alkenes to allylic alcohols or α,β-unsaturated carbonyl compounds.",
+    conditions="SeO2 (1-1.5 equiv), dioxane/H2O, 80-100°C. Catalytic: SeO2 (5-20 mol%) + t-BuOOH (stoich.), CH2Cl2, RT.",
+    substrate="Alkenes → allylic alcohols (with t-BuOOH) or enones (stoich. SeO2). Methyl ketones → 1,2-diketones. α-Methylene → α-hydroxy.",
+    limitations="Toxic Se. Regioselectivity follows ene-like mechanism (H abstracted from more substituted end). Over-oxidation to enone possible.",
+    mechanism="SeO2 → ene reaction with alkene → allylseleninic acid → [2,3]-sigmatropic rearrangement → allylselenic acid ester → hydrolysis → allylic alcohol (+ Se or re-oxidation).",
+    refs="Riley, Morley, Friend, J. Chem. Soc. 1932, 1875. Umbreit, Sharpless, JACS 1977, 99, 5526.",
+    related="Wacker Oxidation, Rubottom Oxidation",
+    functional_groups="alkene, allylic alcohol, enone, SeO2")
+
+_nr("Pfitzner-Moffatt Oxidation",
+    aliases=["Moffatt oxidation"],
+    category="Oxidation", type_="Alcohol to Carbonyl",
+    summary="DMSO/DCC-mediated oxidation of primary and secondary alcohols to aldehydes and ketones.",
+    conditions="DMSO, DCC (or EDC), pyridinium trifluoroacetate or H3PO4 (acid catalyst), CH2Cl2, RT, 2-16 h.",
+    substrate="Primary alcohols → aldehydes (no over-oxidation). Secondary alcohols → ketones. Very mild conditions.",
+    limitations="DCC urea byproduct difficult to remove. Pyridinium salt can be hard to separate. Replaced largely by Swern/Dess-Martin.",
+    mechanism="Acid activates DMSO → electrophilic S attacks alcohol → alkoxysulfonium salt → intramolecular elimination (like Swern) → carbonyl + Me2S.",
+    refs="Pfitzner, Moffatt, JACS 1963, 85, 3027.",
+    related="Swern Oxidation, Parikh-Doering, Dess-Martin Periodinane",
+    functional_groups="alcohol, aldehyde, ketone, DMSO")
+
+_nr("Malaprade Cleavage",
+    aliases=["periodate cleavage", "Malaprade"],
+    category="Oxidation", type_="Diol Cleavage",
+    summary="Periodate (IO4⁻) cleavage of 1,2-diols to give two carbonyl compounds (aldehydes/ketones).",
+    conditions="NaIO4 (1-1.5 equiv), H2O or H2O/THF or H2O/MeOH, RT, 0.5-4 h. Silica-supported NaIO4 in CH2Cl2.",
+    substrate="1,2-Diols → 2 aldehydes/ketones. 1,2-Amino alcohols → aldehyde + amine (slower). α-Hydroxy acids → aldehyde + CO2.",
+    limitations="Requires vicinal diol (1,2-relationship). Does not cleave 1,3-diols. Sensitive to pH. IO3⁻ byproduct.",
+    mechanism="Cyclic periodate ester forms between diol and IO4⁻ → [3+2] retrocyclization → two carbonyls + IO3⁻. Concerted, retro-[3+2] mechanism.",
+    refs="Malaprade, Bull. Soc. Chim. Fr. 1928, 43, 683.",
+    related="Lemieux-Johnson Oxidation, Ozonolysis, Sharpless Dihydroxylation",
+    functional_groups="1,2-diol, aldehyde, ketone, periodate")
+
+# --- Reduction (v7.1.0) ---
+
+_nr("Brown Hydroboration",
+    aliases=["hydroboration", "hydroboration-oxidation", "Brown HB"],
+    category="Reduction", type_="Hydroboration",
+    summary="Anti-Markovnikov addition of B-H across alkenes, followed by oxidation to give primary alcohols. Syn-addition with predictable regio- and stereochemistry.",
+    conditions="BH3·THF or BH3·SMe2 (3:1 alkene:BH3 ratio), THF, 0°C-RT, 1-4 h. Then NaOH/H2O2 (oxidation). Selective boranes: 9-BBN, disiamylborane, thexylborane.",
+    substrate="Alkenes → primary alcohols (anti-Markovnikov). syn-Addition. 9-BBN: highly selective for less hindered C=C.",
+    limitations="syn-Selectivity only. Alkynes give vinylboranes (→ aldehydes/ketones). Competing hydroboration of multiple C=C. Sensitive to air/moisture.",
+    mechanism="Concerted 4-center addition: B-H adds syn across C=C → trialkylborane. Oxidation: H2O2/OH⁻ → ate complex → 1,2-shift with retention → borate ester → hydrolysis → alcohol.",
+    refs="Brown, Rao, JACS 1956, 78, 5694. Brown, Zweifel, JACS 1960, 82, 4708.",
+    related="Sharpless Epoxidation, Fleming-Tamao",
+    functional_groups="alkene, organoborane, alcohol")
+
+_nr("Transfer Hydrogenation",
+    aliases=["Meerwein-Ponndorf-Verley variant", "ATH", "asymmetric transfer hydrogenation"],
+    category="Reduction", type_="Catalytic Hydrogenation",
+    summary="Catalytic reduction using H-donors (iPrOH, HCO2H/Et3N) instead of H2 gas. Avoids high-pressure equipment.",
+    conditions="Noyori ATH: [RuCl2(p-cymene)]2/TsDPEN (0.5-2 mol%), HCO2H:Et3N (5:2), CH2Cl2 or H2O, RT-40°C. MPV: Al(OiPr)3, iPrOH, reflux.",
+    substrate="Ketones → chiral secondary alcohols (ATH). Imines → amines. Quinolines → tetrahydroquinolines.",
+    limitations="Slower than H2 hydrogenation. Equilibrium with iPrOH (must remove acetone). ATH: ee depends on substrate steric differentiation.",
+    mechanism="Ru-hydride formed by β-hydride elimination from formate or iPrOH → outer-sphere concerted transfer to C=O through 6-membered pericyclic TS (no coordination to metal).",
+    refs="Noyori, Hashiguchi, Acc. Chem. Res. 1997, 30, 97.",
+    related="Noyori Asymmetric Hydrogenation, CBS Reduction, Meerwein-Ponndorf-Verley",
+    functional_groups="ketone, alcohol, imine, amine, chiral")
+
+# --- Heterocycle Synthesis (v7.1.0) ---
+
+_nr("Knorr Pyrrole Synthesis",
+    aliases=["Knorr pyrrole"],
+    category="Heterocycle Synthesis", type_="Pyrrole Formation",
+    summary="Condensation of an α-aminoketone with a β-ketoester to form substituted pyrroles.",
+    conditions="α-Aminoketone (from α-oximino ketone reduction with Zn/AcOH) + ethyl acetoacetate, AcOH, 60-80°C or RT if pre-formed amine.",
+    substrate="α-Aminoketones + 1,3-dicarbonyls → 2,3,4,5-tetrasubstituted pyrroles.",
+    limitations="α-Aminoketones can self-condense → must generate in situ. Regiochemistry controlled by substitution pattern.",
+    mechanism="Condensation of amine with ketone of β-ketoester → enamine → intramolecular cyclization with second carbonyl → dehydration → pyrrole.",
+    refs="Knorr, Ber. Dtsch. Chem. Ges. 1884, 17, 1635.",
+    related="Paal-Knorr, Hantzsch Pyridine",
+    functional_groups="α-aminoketone, β-ketoester, pyrrole")
+
+_nr("Gewald Reaction",
+    aliases=["Gewald thiophene"],
+    category="Heterocycle Synthesis", type_="Thiophene Formation",
+    summary="Multicomponent synthesis of 2-aminothiophenes from ketones, α-cyanoacetates, and elemental sulfur.",
+    conditions="Ketone + ethyl cyanoacetate + S8, Et3N or morpholine (base), EtOH, reflux, 4-12 h.",
+    substrate="Ketones (including cyclic) + activated nitriles + sulfur → 2-amino-3-carboxythiophenes.",
+    limitations="Works best with activated methylene (α to CN). Aromatic ketones less reactive. S8 can be limiting in some solvents.",
+    mechanism="Knoevenagel condensation of ketone + cyanoacetate → α,β-unsaturated nitrile → sulfur incorporation via thiolate → cyclization → aromatization → 2-aminothiophene.",
+    refs="Gewald, Schinke, Böttcher, Chem. Ber. 1966, 99, 94.",
+    related="Paal-Knorr, Hantzsch Pyridine",
+    functional_groups="ketone, cyanoacetate, sulfur, aminothiophene")
+
+_nr("Skraup Quinoline Synthesis",
+    aliases=["Skraup synthesis", "Doebner-von Miller"],
+    category="Heterocycle Synthesis", type_="Quinoline Formation",
+    summary="Acid-catalyzed condensation of anilines with glycerol (or α,β-unsaturated carbonyls) to form quinolines.",
+    conditions="Aniline + glycerol, H2SO4 (conc.), oxidant (nitrobenzene or PhNO2), FeSO4·7H2O (moderator), 120-180°C. CAUTION: exothermic, can be violent!",
+    substrate="Anilines → quinolines. Substituted anilines give regioselectively substituted products. Doebner-von Miller variant: use preformed α,β-unsaturated aldehyde/ketone instead of glycerol.",
+    limitations="Extremely exothermic — add FeSO4 as moderator. Can be violent. Yields moderate (40-70%). Para-substituted anilines only give one regioisomer.",
+    mechanism="Glycerol → acrolein (in situ dehydration) → conjugate addition by aniline → cyclization → oxidation (by PhNO2) → aromatization → quinoline.",
+    refs="Skraup, Ber. Dtsch. Chem. Ges. 1880, 13, 2086.",
+    related="Combes synthesis, Friedländer synthesis, Hantzsch",
+    functional_groups="aniline, glycerol, quinoline")
+
+_nr("Van Leusen Oxazole Synthesis",
+    aliases=["Van Leusen", "TosMIC oxazole"],
+    category="Heterocycle Synthesis", type_="Oxazole Formation",
+    summary="Synthesis of 4,5-disubstituted oxazoles from TosMIC (tosylmethyl isocyanide) and aldehydes.",
+    conditions="TosMIC (1-1.2 equiv), aldehyde, K2CO3 (2 equiv), MeOH, reflux, 1-6 h.",
+    substrate="Aldehydes + TosMIC → 4,5-disubstituted oxazoles. Also: imines + TosMIC → imidazoles (Van Leusen 3-component).",
+    limitations="TosMIC is moisture-sensitive. Best with aliphatic and aromatic aldehydes. Enolizable aldehydes may give side products.",
+    mechanism="Deprotonation of TosMIC → carbanion attacks aldehyde → cyclization onto isocyanide carbon → [1,2]-elimination of TsH → oxazole.",
+    refs="Van Leusen, Wildeman, Oldenziel, JOC 1977, 42, 1153.",
+    related="Hantzsch Pyridine, Fischer Indole",
+    functional_groups="aldehyde, isocyanide, oxazole, TosMIC")
+
+# --- Rearrangements (v7.1.0) ---
+
+_nr("Fries Rearrangement",
+    aliases=["Fries"],
+    category="Rearrangement", type_="Acyl Migration",
+    summary="Lewis acid-catalyzed rearrangement of aryl esters to hydroxyaryl ketones (ortho or para).",
+    conditions="ArOC(=O)R + AlCl3 (1-2 equiv), CS2 or PhNO2 or neat, 25°C (para-selective) or 100-160°C (ortho-selective). Photo-Fries: UV light, no Lewis acid.",
+    substrate="Aryl esters → ortho-hydroxyaryl ketones (high T) or para-hydroxyaryl ketones (low T).",
+    limitations="Stoichiometric AlCl3 (coordinates product). Temperature-dependent regio. Photo-Fries gives ortho-selectively.",
+    mechanism="Lewis acid forms acylium + phenoxide → electrophilic acylation of electron-rich arene → ortho/para selectivity controlled by kinetic vs thermodynamic control.",
+    refs="Fries, Finck, Ber. Dtsch. Chem. Ges. 1908, 41, 4271.",
+    related="Friedel-Crafts Acylation, Beckmann Rearrangement",
+    functional_groups="aryl ester, hydroxyaryl ketone, phenol")
+
+_nr("Overman Rearrangement",
+    aliases=["Overman"],
+    category="Rearrangement", type_="[3,3]-Sigmatropic",
+    summary="[3,3]-Sigmatropic rearrangement of allylic trichloroacetimidates to allylic trichloroacetamides — converts allylic alcohols to allylic amines.",
+    conditions="Allylic alcohol + Cl3CCN, DBU (cat.), CH2Cl2, RT → trichloroacetimidate. Then: xylene, 140°C, or PdCl2(MeCN)2 (5 mol%), CH2Cl2, RT.",
+    substrate="Allylic alcohols → allylic trichloroacetamides (→ allylic amines after hydrolysis). 1,3-Chirality transfer with suprafacial selectivity.",
+    limitations="Thermal conditions harsh. Pd-catalyzed version much milder but can give different stereoselectivity. Trichloroacetamide must be hydrolyzed to free amine.",
+    mechanism="[3,3]-Sigmatropic (like Claisen) through chair TS. Imidate O → amide N. Chirality transfers with predictable stereochemistry.",
+    refs="Overman, JACS 1976, 98, 2901. Overman, Angew. Chem. Int. Ed. 1984, 23, 579.",
+    related="Claisen Rearrangement, Ireland-Claisen",
+    functional_groups="allylic alcohol, trichloroacetimidate, allylic amine")
+
+_nr("Schmidt Reaction",
+    aliases=["Schmidt"],
+    category="Rearrangement", type_="Nitrogen Insertion",
+    summary="Acid-catalyzed reaction of carboxylic acids, ketones, or aldehydes with hydrazoic acid (HN3) to give amines, lactams, or nitriles.",
+    conditions="Substrate + NaN3, H2SO4 (conc.) or TfOH, CHCl3 or CH2Cl2, 0°C-RT. Ketone variant: intramolecular (for lactam formation in total synthesis).",
+    substrate="RCOOH + HN3 → RNH2 (amine). R2CO + HN3 → lactam (Beckmann-like). RCHO + HN3 → RCN (nitrile).",
+    limitations="HN3 is toxic and explosive! Handle with extreme care. Regioselectivity in unsymmetrical ketones: migratory aptitude of anti-periplanar group.",
+    mechanism="Acid activates substrate → nucleophilic addition of HN3 → 1,2-shift (anti-periplanar migration) with loss of N2 → iminium/acylium → hydrolysis → product.",
+    refs="Schmidt, Ber. Dtsch. Chem. Ges. 1924, 57, 704.",
+    related="Beckmann Rearrangement, Curtius Rearrangement, Hofmann Rearrangement",
+    functional_groups="ketone, carboxylic acid, HN3, lactam, amine")
+
+_nr("Piancatelli Rearrangement",
+    aliases=["Piancatelli"],
+    category="Rearrangement", type_="Ring Contraction/Expansion",
+    summary="Acid-catalyzed rearrangement of 2-furylcarbinols to 4-hydroxycyclopentenones (or with amines to give aminocyclopentenones).",
+    conditions="2-Furylcarbinol, H2O, acid (p-TsOH, La(OTf)3, Dy(OTf)3), 60-120°C. Aza-Piancatelli: amine instead of H2O.",
+    substrate="2-Furylcarbinols → trans-4-hydroxycyclopentenones. Aza variant: + RNH2 → trans-4-aminocyclopentenones.",
+    limitations="Requires furfuryl alcohol substrates. Diastereoselectivity typically trans (thermodynamic). Moderate yields for some substrates.",
+    mechanism="Acid-catalyzed ring-opening of furan → hydroxypentadienyl cation → 4π electrocyclic ring closure (conrotatory) → cyclopentenone.",
+    refs="Piancatelli, Scettri, D'Auria, Tetrahedron 1980, 36, 661.",
+    related="Paal-Knorr, Favorskii Rearrangement",
+    functional_groups="furfuryl alcohol, cyclopentenone, furan")
+
+_nr("Meinwald Rearrangement",
+    aliases=["Meinwald"],
+    category="Rearrangement", type_="Epoxide Ring-Opening",
+    summary="Lewis or Brønsted acid-catalyzed isomerization of epoxides to carbonyl compounds (aldehydes or ketones).",
+    conditions="Epoxide + BF3·Et2O (0.1-1 equiv) or ZnBr2, MgBr2, LiClO4, InCl3, CH2Cl2, -78°C to RT.",
+    substrate="Aryl epoxides → aryl acetaldehydes (1,2-hydride shift) or aryl methyl ketones (1,2-aryl shift). Selectivity depends on Lewis acid and substitution.",
+    limitations="Regiochemistry of ring-opening (which C-O breaks) and migratory aptitude determine product. Competitive elimination to allylic alcohol.",
+    mechanism="Lewis acid coordinates to epoxide O → heterolytic C-O cleavage → carbocation stabilized by adjacent group → 1,2-shift (H or aryl) → carbonyl.",
+    refs="Meinwald, Sinz, Crandall, JACS 1963, 85, 582.",
+    related="Payne rearrangement, Favorskii Rearrangement",
+    functional_groups="epoxide, aldehyde, ketone, Lewis acid")
+
+# --- Other Useful Reactions (v7.1.0) ---
+
+_nr("Arbuzov Reaction",
+    aliases=["Michaelis-Arbuzov", "Arbuzov"],
+    category="Functional Group Transformation", type_="P-C Bond Formation",
+    summary="Reaction of trialkyl phosphites with alkyl halides to give dialkyl alkylphosphonates (Wittig-Horner reagents).",
+    conditions="P(OR)3 + R'X (X = I, Br, OTs), neat or in toluene, 80-160°C, 2-24 h. Iodides fastest. No catalyst needed.",
+    substrate="Trialkyl phosphites + alkyl halides → phosphonates. Product phosphonates used in HWE olefination.",
+    limitations="Only primary and some secondary halides (SN2). Tertiary halides give elimination. Requires high temperature. Halide byproduct.",
+    mechanism="SN2 by P on alkyl halide → phosphonium salt → dealkylation by halide (SN2 on P-alkyl) → phosphonate + RX.",
+    refs="Arbuzov, J. Russ. Phys. Chem. Soc. 1906, 38, 687.",
+    related="Horner-Wadsworth-Emmons, Wittig",
+    functional_groups="phosphite, alkyl halide, phosphonate")
+
+_nr("Balz-Schiemann Reaction",
+    aliases=["Schiemann reaction", "Balz-Schiemann"],
+    category="Functional Group Transformation", type_="Halogenation",
+    summary="Thermal decomposition of aryldiazonium tetrafluoroborates to give aryl fluorides.",
+    conditions="ArNH2 → ArN2+ BF4⁻ (diazotization with NaNO2/HBF4). Dry ArN2+BF4⁻ → thermal decomposition (Δ, 80-150°C) → ArF + N2 + BF3.",
+    substrate="Aromatic amines → aryl fluorides (via diazonium tetrafluoroborate).",
+    limitations="Diazonium salts potentially explosive when dry — handle with care! Moderate yields. Modern alternatives: Pd-catalyzed fluorination, nucleophilic aromatic substitution.",
+    mechanism="ArNH2 + HONO → ArN2+ → ion exchange with HBF4 → ArN2+BF4⁻ → thermal or photolytic loss of N2 → aryl cation → fluoride transfer from BF4⁻ → ArF.",
+    refs="Balz, Schiemann, Ber. Dtsch. Chem. Ges. 1927, 60, 1186.",
+    related="Sandmeyer Reaction",
+    functional_groups="amine, diazonium, aryl fluoride")
+
+_nr("Burgess Reagent Dehydration",
+    aliases=["Burgess reagent", "Burgess"],
+    category="Functional Group Transformation", type_="Dehydration",
+    summary="Mild, neutral dehydration of secondary and tertiary alcohols to alkenes using Burgess reagent (methyl N-(triethylammoniumsulfonyl)carbamate).",
+    conditions="Burgess reagent (1.1-1.5 equiv), benzene or toluene or THF, reflux, 1-4 h. Also: microwave, 80-120°C, 5-15 min.",
+    substrate="2° and 3° alcohols → alkenes (syn-elimination, cis product from trans-diaxial alcohol). Also dehydrates primary amides → nitriles.",
+    limitations="Sensitive to moisture (store under N2). syn-Elimination selectivity. Not for primary alcohols (no β-H elimination possible).",
+    mechanism="Alcohol attacks electrophilic S of Burgess reagent → carbamate intermediate → intramolecular syn-elimination (Ei, concerted) → alkene.",
+    refs="Burgess, Penton, Taylor, JOC 1973, 38, 26. Atkins, Burgess, JACS 1968, 90, 4744.",
+    related="Martin sulfurane, Corey-Winter, Bamford-Stevens",
+    functional_groups="alcohol, alkene, dehydration, nitrile")
+
+_nr("Corey-Nicolaou Macrolactonization",
+    aliases=["Corey-Nicolaou"],
+    category="Functional Group Transformation", type_="Macrolactonization",
+    summary="Thioester activation for macrolactone formation. Forms macrocyclic lactones from ω-hydroxy acids under mild conditions.",
+    conditions="ω-Hydroxy acid + 2,2'-dipyridyl disulfide (Aldrithiol-2) + PPh3, CH2Cl2, RT → 2-pyridinethiol ester. Then high-dilution cyclization in toluene, reflux (or RT).",
+    substrate="ω-Hydroxy acids (seco-acids) → macrolactones (12-16+ membered rings). Key reaction in macrolide natural product synthesis.",
+    limitations="Requires high dilution (0.001-0.01 M) to favor cyclization over oligomerization. Thiol byproduct. Multiple steps.",
+    mechanism="PPh3 activates disulfide → mixed anhydride → thioester → intramolecular lactonization: thioester C=O activated by protonation (2-pyridinethiol is good leaving group + internal base).",
+    refs="Corey, Nicolaou, JACS 1974, 96, 5614.",
+    related="Yamaguchi Esterification, Shiina Macrolactonization, Steglich Esterification",
+    functional_groups="ω-hydroxy acid, macrolactone, thioester")
+
+_nr("Koenigs-Knorr Glycosylation",
+    aliases=["Koenigs-Knorr"],
+    category="Functional Group Transformation", type_="Glycosylation",
+    summary="Ag or Hg salt-promoted glycosylation of glycosyl halides with alcohols to form O-glycosidic bonds.",
+    conditions="Glycosyl bromide (peracetylated) + ROH, Ag2CO3 or AgOTf or HgBr2/Hg(CN)2 (promoter), CH2Cl2 or MeCN, molecular sieves, RT-40°C.",
+    substrate="Glycosyl bromides/chlorides + alcohols → glycosides (α or β depending on C2 participation). Neighboring group participation by C2-OAc → 1,2-trans (β-glucoside).",
+    limitations="Requires glycosyl halide (synthesis step). Anomeric selectivity depends on protecting groups and conditions. Ag salts expensive.",
+    mechanism="Ag+ or Hg2+ abstracts halide → oxocarbenium ion → if C2-acyl participating group: acyloxonium intermediate → nucleophilic attack from opposite face → 1,2-trans product.",
+    refs="Koenigs, Knorr, Ber. Dtsch. Chem. Ges. 1901, 34, 957.",
+    related="Fischer glycosylation, Ferrier Rearrangement",
+    functional_groups="glycosyl halide, alcohol, glycoside, carbohydrate")
+
+_nr("Modified Julia Olefination",
+    aliases=["Julia-Kocienski", "Kocienski olefination", "Barbier-Julia"],
+    category="C-C Bond Formation", type_="Olefination",
+    summary="One-pot olefination using heteroaryl sulfones (benzothiazol-2-yl or 1-phenyl-1H-tetrazol-5-yl) with aldehydes. More practical than classical Julia-Lythgoe.",
+    conditions="Sulfone + n-BuLi or LiHMDS or KHMDS (1.1 equiv), THF, -78°C, then RCHO, -78°C → RT. E-selective with KHMDS; Z-selective with smaller bases in some cases.",
+    substrate="Alkyl/benzyl BT-sulfones or PT-sulfones + aldehydes → alkenes (E or Z depending on base/sulfone). SO2 and heterocycle lost directly.",
+    limitations="Sulfone preparation required. E/Z selectivity substrate-dependent. Some reagent cost for BT/PT sulfones.",
+    mechanism="Metallated sulfone + RCHO → β-alkoxysulfone → Smiles rearrangement → spontaneous elimination of SO2 + ArOH → alkene. One-pot (unlike classical Julia which requires reduction step).",
+    refs="Baudin, Julia, Bull. Soc. Chim. Fr. 1993, 130, 856. Blakemore, J. Chem. Soc., Perkin Trans. 1 2002, 2563.",
+    related="Julia-Lythgoe, Wittig, HWE, Peterson",
+    functional_groups="sulfone, aldehyde, alkene")
+
+_nr("Shapiro Reaction",
+    aliases=["Shapiro"],
+    category="C-C Bond Formation", type_="Olefination",
+    summary="Base-induced decomposition of tosylhydrazones to give alkenes via vinyl dianion (vinylcarbenoid) intermediates.",
+    conditions="Tosylhydrazone + n-BuLi (2.2 equiv), THF or TMEDA, -78°C → 0°C → RT. Or: NaH, DME, reflux.",
+    substrate="Ketone or aldehyde → tosylhydrazone → vinyl dianion → alkene (less substituted alkene preferred = Hofmann selectivity).",
+    limitations="Requires stoichiometric strong base (2 equiv needed). Regioselectivity gives less substituted alkene. Not for base-sensitive substrates.",
+    mechanism="First equiv n-BuLi → deprotonation → dianion. Second equiv → α-elimination of TsLi → diazene → loss of N2 → vinyl carbenoid → protonation → alkene (or trapping with electrophile).",
+    refs="Shapiro, Health, JACS 1967, 89, 5734.",
+    related="Bamford-Stevens, Wolff-Kishner, Wittig",
+    functional_groups="ketone, tosylhydrazone, alkene, vinyl carbenoid")
+
+_nr("Roskamp Reaction",
+    aliases=["Roskamp"],
+    category="C-C Bond Formation", type_="Homologation",
+    summary="Lewis acid-catalyzed reaction of aldehydes with ethyl diazoacetate to give β-keto esters (homologation).",
+    conditions="RCHO + N2CHCO2Et, BF3·Et2O or SnCl2 or Lewis acid (1-10 mol%), CH2Cl2, 0°C-RT, 1-4 h.",
+    substrate="Aldehydes + EDA → β-keto esters. One-carbon homologation with introduction of ester group.",
+    limitations="Diazo compounds require careful handling (toxic, potentially explosive). Lewis acid choice affects yield. Ketones less reactive.",
+    mechanism="Lewis acid activates aldehyde → nucleophilic addition of diazo → 1,2-H shift with loss of N2 → β-keto ester.",
+    refs="Roskamp, Johnson, JACS 1986, 108, 6062.",
+    related="Arndt-Eistert, Tiffeneau-Demjanov",
+    functional_groups="aldehyde, diazoacetate, β-keto ester")
+
+_nr("Rieche Formylation",
+    aliases=["Rieche"],
+    category="Functional Group Transformation", type_="C-H Formylation",
+    summary="Lewis acid-catalyzed ortho-formylation of electron-rich arenes using dichloromethyl methyl ether (Cl2CHOMe) as formyl equivalent.",
+    conditions="ArH + Cl2CHOMe (1.1 equiv), TiCl4 or SnCl4 (1.1 equiv), CH2Cl2, -78°C → 0°C, 1-4 h. Then aqueous workup.",
+    substrate="Electron-rich arenes (phenols, anisoles, indoles) → aryl aldehydes. Ortho-selective when position available.",
+    limitations="Requires electron-rich arenes. TiCl4 stoichiometric. Low temperature needed. Competing poly-formylation.",
+    mechanism="TiCl4 + Cl2CHOMe → chloromethyleneoxy cation (or free chloro carbocation) → electrophilic aromatic substitution → α-chloro ether intermediate → hydrolysis → aldehyde.",
+    refs="Rieche, Gross, Höft, Chem. Ber. 1960, 93, 88.",
+    related="Vilsmeier-Haack Formylation, Friedel-Crafts Acylation, Duff reaction",
+    functional_groups="arene, aldehyde, TiCl4")
+
+_nr("Prevost Reaction",
+    aliases=["Prevost", "Prevost dihydroxylation"],
+    category="Functional Group Transformation", type_="Dihydroxylation",
+    summary="Silver carboxylate/iodine-mediated anti-dihydroxylation of alkenes via cyclic iodonium/diacetate intermediates.",
+    conditions="Alkene + I2 (1 equiv) + AgOAc (2 equiv), AcOH or CCl4, reflux. Woodward modification (wet conditions): gives syn-diol.",
+    substrate="Alkenes → anti-1,2-diols (after saponification of diacetate). Woodward variant (H2O present): syn-1,2-diols.",
+    limitations="Stoichiometric Ag and I2. Functional group tolerance limited. Largely superseded by Sharpless AD.",
+    mechanism="I2 + alkene → cyclic iodonium → AgOAc opens anti → iodoacetate → second AgOAc displaces I (SN2, inversion) → anti-diacetate → hydrolysis → anti-diol.",
+    refs="Prevost, C.R. Acad. Sci. 1933, 196, 1129. Woodward, Brutcher, JACS 1958, 80, 209.",
+    related="Sharpless Dihydroxylation, Upjohn Dihydroxylation",
+    functional_groups="alkene, diol, iodine, silver acetate")
+
+_nr("Polonovski Reaction",
+    aliases=["Polonovski", "Potier-Polonovski"],
+    category="Functional Group Transformation", type_="N-Demethylation",
+    summary="TFAA-mediated conversion of N-oxides to iminium ions (Potier modification), enabling C-C bond formation or N-demethylation.",
+    conditions="Amine N-oxide + TFAA (1.1 equiv), CH2Cl2, -78°C → 0°C. Potier: add nucleophile (CN⁻, allylsilane, silyl enol ether) to trap iminium.",
+    substrate="Tertiary amine N-oxides → iminium ions → trapped by nucleophiles or reduced (N-demethylation).",
+    limitations="Requires N-oxide preparation (m-CPBA oxidation). Regioselectivity of elimination. Sensitive to reaction temperature.",
+    mechanism="TFAA activates N-oxide → [2,3]-elimination → iminium + trifluoroacetaldehyde → nucleophilic addition → functionalized amine.",
+    refs="Polonovski, Polonovski, Bull. Soc. Chim. Fr. 1927, 41, 1190. Potier, Janot, Ann. Pharm. Fr. 1973, 31, 707.",
+    related="Eschweiler-Clarke, Mannich",
+    functional_groups="N-oxide, iminium, amine")
+
+_nr("Kharasch Addition",
+    aliases=["Kharasch", "atom transfer radical addition", "ATRA"],
+    category="C-C Bond Formation", type_="Radical Addition",
+    summary="Radical addition of polyhalomethanes (CCl4, CBr4, CHCl3) across alkenes — anti-Markovnikov addition with atom transfer.",
+    conditions="Alkene + CCl4, CuCl (5-10 mol%) or [RuCl2(PPh3)3] or AIBN (radical initiator), 60-80°C. Modern: photoredox catalysis.",
+    substrate="Terminal alkenes + CX4 → 1:1 adducts (anti-Markovnikov Cl3C-CH2-CHR-Cl). Useful for trichloromethylation.",
+    limitations="Polymerization (telomerization) competes with 1:1 addition. Selectivity depends on catalyst and conditions.",
+    mechanism="CuCl/L → Cl• radical from CCl4 (via inner-sphere electron transfer) → •CCl3 adds to alkene → radical → atom transfer from CuCl2 → product + CuCl.",
+    refs="Kharasch, Jensen, Urry, Science 1945, 102, 128.",
+    related="Minisci, Meerwein arylation",
+    functional_groups="alkene, CCl4, radical, atom transfer")
+
+_nr("Blanc Chloromethylation",
+    aliases=["Blanc reaction"],
+    category="Functional Group Transformation", type_="Electrophilic Aromatic Substitution",
+    summary="Introduction of a chloromethyl (-CH2Cl) group onto aromatic rings using formaldehyde and HCl.",
+    conditions="ArH + HCHO (37% aq. or paraformaldehyde) + HCl (conc.) or ZnCl2 catalyst, AcOH, 40-60°C.",
+    substrate="Activated arenes → ArCH2Cl (benzylic chlorides). Useful for subsequent SN2, Sommelet (→ ArCHO), or Friedel-Crafts.",
+    limitations="Bis(chloromethyl) ether (BCME) is a potent carcinogen formed as byproduct — extreme caution! Use ZnCl2/HCl alternative. Regioselectivity: ortho/para.",
+    mechanism="HCHO + HCl → ClCH2OH (chloromethanol) → electrophilic aromatic substitution (SE-Ar) → ArCH2Cl + H2O.",
+    refs="Blanc, Bull. Soc. Chim. Fr. 1923, 33, 313.",
+    related="Friedel-Crafts Alkylation, Vilsmeier-Haack",
+    functional_groups="arene, chloromethyl, formaldehyde, SAFETY: BCME carcinogen")
+
+_nr("Mander Methylenation",
+    aliases=["Mander reagent", "Mander's reagent"],
+    category="Functional Group Transformation", type_="Ester Introduction",
+    summary="Introduction of a methoxycarbonyl group at the α-position of ketones using methyl cyanoformate (Mander's reagent, NCCO2Me).",
+    conditions="Ketone → enolate (LDA, LiHMDS, or NaH, THF, -78°C) + NCCO2Me (1.1-1.5 equiv), -78°C → RT, 1-12 h.",
+    substrate="Ketone enolates + NCCO2Me → α-carbomethoxy ketones (β-keto esters). Regioselective based on enolate formation.",
+    limitations="Requires regioselective enolization. CN⁻ byproduct. Excess reagent can give over-alkylation. Moisture-sensitive.",
+    mechanism="Enolate C-nucleophile attacks electrophilic C of NCCO2Me → tetrahedral intermediate → loss of CN⁻ → β-keto ester.",
+    refs="Mander, Sethi, Tetrahedron Lett. 1983, 24, 5425.",
+    related="Claisen Condensation, Dieckmann Cyclization",
+    functional_groups="ketone, enolate, β-keto ester, cyanoformate")
+
+_nr("Eschenmoser-Tanabe Fragmentation",
+    aliases=["Eschenmoser fragmentation"],
+    category="Fragmentation", type_="Ring Fragmentation",
+    summary="Base-induced fragmentation of α,β-epoxyketones to give alkynyl ketones (ynones) via ring opening.",
+    conditions="α,β-Epoxyketone + arenesulfonyl hydrazine (TsNHNH2 or mesitylenesulfonyl hydrazide), then Et3N or NaOAc, CH2Cl2 or EtOH, RT-60°C.",
+    substrate="α,β-Epoxyketones → ynones (ring-opened products with triple bond). Useful for macrocyclic ring expansion or opening.",
+    limitations="Requires access to α,β-epoxyketone. Sulfonyl hydrazide needed. Not all ring systems fragment cleanly.",
+    mechanism="Hydrazone formation at ketone → epoxide opens (anti-periplanar) → β-elimination of sulfonyl group → diazo intermediate → loss of N2 → vinyl carbene → alkyne.",
+    refs="Eschenmoser, Felix, Ohloff, Helv. Chim. Acta 1967, 50, 708. Tanabe, Hayashi, JACS 1971, 93, 3779.",
+    related="Wharton Fragmentation, Bamford-Stevens",
+    functional_groups="epoxyketone, ynone, alkyne, fragmentation")
+
+_nr("Carroll Rearrangement",
+    aliases=["Carroll"],
+    category="Rearrangement", type_="[3,3]-Sigmatropic",
+    summary="[3,3]-Sigmatropic rearrangement of allylic esters of β-keto acids, followed by decarboxylation, to give γ,δ-unsaturated ketones.",
+    conditions="Allylic acetoacetate, 150-200°C, or Pd(0) catalysis (Pd(PPh3)4, 5 mol%, THF, 65°C) for much milder conditions.",
+    substrate="Allylic β-keto esters → γ,δ-unsaturated ketones (after decarboxylation). Combines Claisen rearrangement + decarboxylation in one pot.",
+    limitations="Thermal version requires harsh conditions. Pd-catalyzed version milder but requires tuning. Competing retro-Claisen.",
+    mechanism="Enolization → [3,3]-sigmatropic (like Claisen) → β-keto acid → decarboxylation → γ,δ-unsaturated ketone.",
+    refs="Carroll, J. Chem. Soc. 1940, 704.",
+    related="Claisen Rearrangement, Ireland-Claisen, Eschenmoser-Claisen",
+    functional_groups="allylic ester, β-keto acid, ketone")
+
+
+
 # =============================================================================
 # Lookup Functions
 # =============================================================================
@@ -3390,3 +3912,803 @@ def lookup_nmr_solvent(query: str) -> list[dict]:
     if not results and q in ("all", "table", "list", ""):
         return NMR_SOLVENTS
     return results
+
+
+
+# =============================================================================
+# Lab Tips — "Law of the Lab" practical bench wisdom (v7.1.0)
+# =============================================================================
+
+LAB_TIPS: dict[str, list[dict]] = {
+    "reaction_setup": [
+        {"title": "Grignard initiation tricks",
+         "tip": "If your Grignard won't start: (1) Crush Mg turnings with a glass rod in the flask to expose fresh surface. (2) Add a crystal of I2 — it etches the oxide layer. (3) Add 1-2 drops of 1,2-dibromoethane — exothermic reaction initiates. (4) Use a heat gun on the flask exterior briefly. (5) Sonication works. (6) As a last resort, add a few drops of pre-formed Grignard (if available) or use Rieke Mg.",
+         "category": "reaction_setup", "tags": "grignard, initiation, magnesium, troubleshooting"},
+        {"title": "Degassing solvents properly",
+         "tip": "Three methods: (1) Freeze-pump-thaw (FPT): freeze in liquid N2, evacuate, thaw, repeat 3×. Gold standard. (2) Sparge: bubble N2 or Ar through solvent for 15-30 min via needle. Good for large volumes. (3) Sonication under vacuum: fastest but least thorough. For cross-coupling and air-sensitive chemistry, FPT is ideal.",
+         "category": "reaction_setup", "tags": "degassing, air-sensitive, freeze-pump-thaw, sparge"},
+        {"title": "Stirring matters more than you think",
+         "tip": "Heterogeneous reactions (Pd/C, K2CO3 suspensions, biphasic) often fail due to poor stirring. Use an appropriately sized stir bar (should cover ~2/3 flask bottom). Egg-shaped for round-bottoms. For viscous mixtures: overhead stirring >> magnetic. If your TLC shows no reaction after 2h, check the stirring first.",
+         "category": "reaction_setup", "tags": "stirring, heterogeneous, troubleshooting"},
+        {"title": "Syringe technique for air-sensitive reagents",
+         "tip": "Flush syringe with N2/Ar before drawing reagent. Use a long needle through septum. Draw slightly more than needed, invert, push out bubbles. Deliver at steady rate — rushing causes spattering. For large volumes (>10 mL), use cannula transfer instead. Replace septa that have been punctured >5 times.",
+         "category": "reaction_setup", "tags": "syringe, air-sensitive, cannula, technique"},
+        {"title": "Scale-up: heat transfer changes everything",
+         "tip": "What worked at 0.5 mmol may fail at 50 mmol. Key changes: (1) Exotherms are much worse — add reagents more slowly. (2) Cooling baths must be larger. (3) Stirring efficiency drops. (4) Concentration may need adjustment. (5) Reaction times increase (mass transfer limited). Rule of thumb: first scale 5-10×, not 100×.",
+         "category": "reaction_setup", "tags": "scale-up, exotherm, heat transfer"},
+        {"title": "Molecular sieves: activation is critical",
+         "tip": "Molecular sieves (3Å or 4Å) must be activated before use: heat to 250-300°C under vacuum for 4-8 h, or microwave for 5 min at high power. Flame-drying (heat gun + vacuum) works for small amounts. Cool under N2/Ar, store in desiccator. Old/saturated sieves are useless. 4Å for general use; 3Å for small molecules (H2O, MeOH); 5Å for larger molecules.",
+         "category": "reaction_setup", "tags": "molecular sieves, drying, activation"},
+    ],
+    "temperature_control": [
+        {"title": "Cooling bath temperatures (quick reference)",
+         "tip": "0°C: ice/water. -10 to -15°C: ice/NaCl (rock salt). -20°C: ice/CaCl2 or dry ice/ethylene glycol. -42°C: dry ice/MeCN. -78°C: dry ice/acetone (or dry ice/iPrOH). -98°C: liquid N2/MeOH (CAUTION). -116°C: liquid N2/ethanol. Keep the bath level above the reaction mixture level. Replenish dry ice regularly — it sublimes!",
+         "category": "temperature_control", "tags": "cooling bath, temperature, dry ice"},
+        {"title": "Cryogenic reaction tips",
+         "tip": "At -78°C: (1) Allow 15 min for flask contents to equilibrate before adding reagents. (2) Add reagents DOWN the flask wall, not directly into solution. (3) Monitor internal temperature if possible (thermocouple through septum). (4) Exothermic additions at low T: slow is key. (5) Stir vigorously — temperature gradients form easily. (6) Wide-mouth Dewar flasks work best for -78°C baths.",
+         "category": "temperature_control", "tags": "cryogenic, low temperature, -78°C, technique"},
+        {"title": "Temperature-dependent selectivity",
+         "tip": "Kinetic vs thermodynamic control: low T → kinetic product (LDA at -78°C for kinetic enolate). High T → thermodynamic product (NaH at RT for thermodynamic enolate). For additions to carbonyls: -78°C often crucial for diastereoselectivity. Warm slowly if you want to catch intermediates on TLC.",
+         "category": "temperature_control", "tags": "kinetic, thermodynamic, selectivity, enolate"},
+    ],
+    "moisture_sensitive": [
+        {"title": "Schlenk line basics",
+         "tip": "Essential for air/moisture-sensitive chemistry. Key rules: (1) Always check manifold for grease cracks. (2) Flame-dry all glassware under vacuum (3× cycle). (3) Use dry N2 or Ar (pass through Drierite column). (4) Keep positive inert gas pressure. (5) Never leave bubblers dry — oil prevents backflow. (6) Label left/right stopcocks clearly: vacuum vs inert gas.",
+         "category": "moisture_sensitive", "tags": "schlenk, air-free, inert atmosphere"},
+        {"title": "Common moisture sources people forget",
+         "tip": "Your reaction might be wet because of: (1) Solvent not dried properly — use solvent system or distill from CaH2/Na. (2) Glassware not flame-dried — even 'oven-dried' glass absorbs H2O. (3) Wet reagents — hygroscopic solids (K2CO3, CsF) need drying. (4) Humid air during transfer. (5) Old/used septa. (6) NMR solvents opened without drying. When in doubt: add molecular sieves.",
+         "category": "moisture_sensitive", "tags": "moisture, drying, water, troubleshooting"},
+        {"title": "Solvent drying guide",
+         "tip": "THF: Na/benzophenone still (blue/purple = dry) or pass through Al2O3. CH2Cl2: CaH2 distillation or Al2O3. DMF: vacuum distillation from CaH2 at reduced pressure (high bp!) or stored over 4Å MS. MeCN: CaH2 distillation. Et2O: Na/benzophenone or Al2O3. Toluene: Na or Al2O3. MeOH: Mg/I2 method. Modern: solvent purification systems (SPS) are the standard.",
+         "category": "moisture_sensitive", "tags": "solvent drying, distillation, purification"},
+    ],
+    "workup_tips": [
+        {"title": "Breaking emulsions — the complete guide",
+         "tip": "(1) Add saturated NaCl (brine) — most effective first step. (2) Add more organic solvent to dilute. (3) Filter through Celite. (4) Add a few drops of iPrOH (breaks surface tension). (5) Centrifuge if available. (6) Let it sit — sometimes 30 min separates layers. (7) Gentle swirling, not vigorous shaking. (8) Add dilute HCl or NaOH to change pH. (9) As a last resort: break emulsion through pipette, discard interface.",
+         "category": "workup", "tags": "emulsion, extraction, troubleshooting, separation"},
+        {"title": "Which drying agent and when",
+         "tip": "Na2SO4: general purpose, cheap, slow (needs 15-30 min), high capacity, removes large amounts of H2O. MgSO4: faster (5-10 min), lower capacity, fine powder can pass through filter. Na2SO4 for large-scale; MgSO4 for quick small-scale. For very dry: molecular sieves after initial drying. Never use Na2SO4 with acid-sensitive compounds (slightly acidic).",
+         "category": "workup", "tags": "drying agent, Na2SO4, MgSO4, extraction"},
+        {"title": "Rotovap technique",
+         "tip": "(1) Water bath ≤40°C for most compounds (volatile aldehydes at 25°C). (2) Spin speed: fast enough for thin film but not splashing. (3) Lower slowly into bath — sudden heating causes bumping. (4) Always use a bump trap. (5) If bumping occurs: reduce vacuum, increase spin speed, add boiling chips. (6) For high-boiling solvents (DMF, DMSO): use high vacuum pump, not house vacuum. (7) Never rotovap HF-containing solutions — etches glass!",
+         "category": "workup", "tags": "rotovap, concentration, evaporation, technique"},
+        {"title": "Aqueous wash sequence for common reactions",
+         "tip": "Standard: H2O → sat. NaHCO3 → brine → dry. After acid-catalyzed: H2O → sat. NaHCO3 (removes acid catalyst) → brine → dry. After base-mediated: H2O → 1M HCl (removes amine/base) → brine → dry. After Pd-catalyzed: filter through Celite first, then standard workup. After DCC coupling: filter urea first, then extract. Always check TLC of each layer!",
+         "category": "workup", "tags": "aqueous workup, washing, extraction, sequence"},
+    ],
+    "purification_tips": [
+        {"title": "When column chromatography fails",
+         "tip": "If your spots co-elute: (1) Try a different solvent system (EtOAc/hex → Et2O/hex → CH2Cl2/MeOH). (2) Add 1% Et3N for basic compounds (prevents tailing). (3) Add 1% AcOH for acidic compounds. (4) Use smaller silica:crude ratio (50:1 → 100:1). (5) Slow gradient (1% steps). (6) Prep TLC for small amounts (<50 mg). (7) Try reverse-phase (C18) or alumina instead of silica.",
+         "category": "purification", "tags": "column, chromatography, troubleshooting, separation"},
+        {"title": "Recrystallization — the underrated technique",
+         "tip": "Often gives higher purity than chromatography. Procedure: (1) Dissolve in minimum hot solvent. (2) Add anti-solvent dropwise until slightly cloudy. (3) Let cool slowly (insulate with cotton/aluminum foil). (4) Scratch flask wall with glass rod to induce crystallization. (5) Collect by filtration (use Büchner funnel + cold wash). Common pairs: EtOH/H2O, EtOAc/hexanes, CH2Cl2/hexanes, hot EtOH alone.",
+         "category": "purification", "tags": "recrystallization, crystallization, purification"},
+        {"title": "Silica gel loading methods",
+         "tip": "Wet loading: dissolve crude in minimum CH2Cl2, load carefully onto silica surface. Dry loading (preferred for large scale): dissolve in CH2Cl2 + add Celite or silica (2× mass), rotovap to dryness → free-flowing powder → load on top of column. Dry loading avoids band broadening from overloading. Never load in DMSO or DMF — they elute slowly and ruin separation.",
+         "category": "purification", "tags": "column, loading, silica, dry loading, technique"},
+    ],
+    "analytical_tips": [
+        {"title": "TLC development tips",
+         "tip": "(1) Spot from dilute solution — overloading gives tailing/streaking. (2) Develop in a pre-saturated chamber (lined with filter paper). (3) Mark spots under UV (254 nm) with pencil IMMEDIATELY — fluorescence fades. (4) Dip in stain (KMnO4 for alkenes/alkynes; vanillin for all; ninhydrin for amines; anisaldehyde for sugars/terpenes). (5) For baseline compounds: try more polar eluent or add 1% AcOH/Et3N.",
+         "category": "analytical", "tags": "TLC, development, staining, troubleshooting"},
+        {"title": "NMR sample preparation matters",
+         "tip": "(1) Use 5-15 mg in 0.6-0.7 mL solvent. (2) Filter through cotton/glass wool plug to remove particulates (causes line broadening). (3) Center sample in coil region (4-5 cm from bottom of tube). (4) For ¹³C: use 20-30 mg minimum (or run overnight). (5) D2O shake: add drop of D2O, shake — exchangeable protons (OH, NH) disappear. (6) For paramagnetic impurities: filter through short silica plug.",
+         "category": "analytical", "tags": "NMR, sample preparation, technique"},
+        {"title": "HRMS: choosing your ionization",
+         "tip": "ESI+ (electrospray, positive): works for most polar/ionizable compounds (amines, amides, peptides). Look for [M+H]+, [M+Na]+, [M+K]+. ESI-: for acids, phenols, sulfonates. APCI: for less polar compounds. EI (electron impact): for volatile small molecules (<500 Da). MALDI: for large molecules (peptides, polymers). If you see [M+Na]+, your compound MW = observed - 22.9898.",
+         "category": "analytical", "tags": "HRMS, mass spec, ionization, ESI"},
+    ],
+    "safety": [
+        {"title": "Azide safety — critical rules",
+         "tip": "⚠️ AZIDES ARE POTENTIALLY EXPLOSIVE. Rules: (1) Never acidify solutions containing NaN3 — HN3 is volatile, toxic (TLV 0.1 ppm), and explosive. (2) Heavy metal azides (Pb, Ag, Hg) are shock-sensitive detonators — NEVER form these. (3) Small organic azides (<C3) can be explosive — keep in solution, never isolate neat. (4) Rule of thumb: (NC + NO)/NTotal ≥ 3 for safe handling. (5) Always destroy excess NaN3 with NaNO2/H2SO4 before disposal. (6) Azide waste → bleach to destroy before drain.",
+         "category": "safety", "tags": "azide, safety, explosive, NaN3, hazard"},
+        {"title": "Peroxide-forming solvents",
+         "tip": "⚠️ EXPLOSION RISK. These solvents form dangerous peroxides on storage/exposure to air: Et2O, THF, dioxane, iPr2O, dimethoxyethane (DME). Rules: (1) Test with KI/starch paper before distilling or concentrating. (2) Date bottles when opened — discard Et2O after 3 months, THF after 6 months. (3) Never distill to dryness. (4) Store over BHT (inhibitor) or molecular sieves. (5) If peroxide test is positive: add FeSO4 or Na2SO3 before concentration.",
+         "category": "safety", "tags": "peroxide, solvent, explosion, THF, Et2O, safety"},
+        {"title": "Swern oxidation odor protocol",
+         "tip": "The Swern oxidation produces dimethyl sulfide (Me2S) — one of the foulest-smelling chemicals in organic chemistry (detectable at 0.001 ppm). Protocol: (1) Work in fume hood with sash down. (2) Have bleach traps ready for DMS waste. (3) Run reaction in well-sealed apparatus. (4) Warn labmates. (5) Alternative DMSO oxidations (Pfitzner-Moffatt, Parikh-Doering) also produce Me2S. (6) Dess-Martin or TEMPO oxidation avoids this entirely.",
+         "category": "safety", "tags": "swern, DMS, smell, odor, oxidation"},
+        {"title": "Pyrophoric reagents: n-BuLi, t-BuLi, LDA, DIBAL-H",
+         "tip": "⚠️ IGNITE ON CONTACT WITH AIR. Rules: (1) Always use sure/seal bottles + needle/syringe technique. (2) Have dry sand bucket nearby (not water extinguisher!). (3) Titrate before use (diphenylacetic acid method for BuLi: yellow→colorless endpoint). (4) t-BuLi: ALWAYS use 2 equiv — first equiv destroys, second is your reagent. Never add t-BuLi to halides containing α-protons. (5) Quench with iPrOH (slow, controlled) not water (violent).",
+         "category": "safety", "tags": "pyrophoric, BuLi, air-sensitive, safety, titration"},
+        {"title": "Ozone (O3) safety",
+         "tip": "⚠️ TOXIC GAS (TLV 0.1 ppm). Ozonolysis protocol: (1) Work in fume hood, keep O3 generator output tubing sealed. (2) Monitor with O3 detector if available. (3) Blue color in O3 solution (at -78°C) indicates saturation — stop generator. (4) Always quench ozonides before warming: PPh3 (→ aldehyde), Me2S (→ aldehyde), NaBH4 (→ alcohol), H2O2 (→ acid). (5) Never warm ozonide intermediates — potentially explosive! (6) Vent excess O3 through KI trap.",
+         "category": "safety", "tags": "ozone, ozonolysis, toxic, safety"},
+        {"title": "Hydrogen gas safety",
+         "tip": "⚠️ FLAMMABLE AND EXPLOSIVE (4-75% in air). Hydrogenation safety: (1) Never use open flames near H2 cylinder. (2) Use balloons or Parr shaker (not pressured bombs) for small scale. (3) Pd/C is pyrophoric when dry + loaded with H2 — always filter wet, never let cake dry on filter. (4) For Parr hydrogenator: check seals, start at low pressure, vent slowly. (5) Evacuate/backfill reaction flask 3× with H2 to purge air.",
+         "category": "safety", "tags": "hydrogen, hydrogenation, Pd/C, flammable, safety"},
+    ],
+    "common_mistakes": [
+        {"title": "Forgetting to check your reagent quality",
+         "tip": "Many failed reactions are due to old/decomposed reagents. Check: (1) n-BuLi: titrate before every use (white precipitate = dead). (2) NaH: old bottles absorb moisture → less reactive (grey instead of white). (3) Pd catalysts: old Pd(PPh3)4 turns green/dark → ineffective. (4) DIAD/DEAD: yellow → red/brown = decomposed. (5) Oxalyl chloride: old bottles have phosgene buildup — open carefully in hood. (6) m-CPBA: titrate with Na2S2O3 (usually 70-77% pure, balance is m-CBA).",
+         "category": "common_mistakes", "tags": "reagent quality, troubleshooting, titration"},
+        {"title": "Concentration matters: dilute vs concentrated",
+         "tip": "Common concentration guidelines: (1) SNAr, SN2: concentrated (0.5-1 M) is fine. (2) Macrolactonization: high dilution essential (0.001-0.01 M). (3) Cross-coupling: 0.1-0.5 M typical. (4) Diels-Alder: concentrated helps (5 M or neat). (5) Radical reactions: 0.1-0.3 M typical. (6) Photochemistry: dilute (0.01-0.05 M) to ensure light penetration. If your reaction is sluggish: try increasing or decreasing concentration.",
+         "category": "common_mistakes", "tags": "concentration, dilution, reaction optimization"},
+        {"title": "TLC before and during — not just after",
+         "tip": "Always run a TLC of your starting material BEFORE starting the reaction (reference spot). Co-spot: apply starting material, product, and co-spot on same plate. This saves hours of wondering which spot is which. Check TLC every 30-60 min for new reactions. Use a pencil (not pen!) to mark TLC plates.",
+         "category": "common_mistakes", "tags": "TLC, monitoring, technique, reference"},
+        {"title": "Base equivalents: substoichiometric kills yield",
+         "tip": "If your reaction needs 'base (1 equiv)' — you need at least 1.05-1.1 equiv to account for moisture, acid impurities, and side reactions. For deprotonations: use 1.1-1.3 equiv of base. For Pd couplings with K2CO3 (2 equiv): weigh carefully — substoichiometric base is the #1 cause of incomplete conversion. Grind K2CO3 fresh for better surface area.",
+         "category": "common_mistakes", "tags": "base, equivalents, stoichiometry, troubleshooting"},
+    ],
+    "time_savers": [
+        {"title": "Parallel TLC: monitor multiple reactions",
+         "tip": "Run multiple reactions at the same time and spot them all on one TLC plate. Use thin lanes (1-2 mm) spaced 5 mm apart. Label with pencil underneath. This is how experienced chemists can run 4-6 reactions simultaneously and know within 2 hours which conditions work best.",
+         "category": "time_savers", "tags": "TLC, parallel, optimization, screening"},
+        {"title": "Quick crude NMR before column",
+         "tip": "Always take a crude ¹H NMR before running a column. This tells you: (1) conversion (starting material present?), (2) product:byproduct ratio, (3) whether chromatography is even necessary (sometimes >90% pure crude can be recrystallized). Saves 2 hours of column for reactions that need re-running.",
+         "category": "time_savers", "tags": "NMR, crude, chromatography, analysis"},
+        {"title": "Overnight reactions: setup for success",
+         "tip": "For reactions left overnight: (1) Ensure stable stirring (bar won't decouple). (2) Check oil bath temperature stability. (3) Top up cooling baths (ice baths won't last — use dry ice/acetone for overnight cold). (4) Leave a note on the hood with your name, date, reaction, expected finish time, and hazards. (5) Use a balloon filled with N2/Ar for positive pressure.",
+         "category": "time_savers", "tags": "overnight, setup, practical, technique"},
+    ],
+}
+
+
+def lookup_lab_tips(query: str) -> list[dict]:
+    """Search lab tips by keyword or category."""
+    q = query.lower().strip()
+    results = []
+    seen_titles = set()
+
+    for category, tips in LAB_TIPS.items():
+        for tip in tips:
+            if tip["title"] in seen_titles:
+                continue
+            searchable = " ".join([
+                tip["title"], tip["tip"], tip.get("tags", ""),
+                tip.get("category", ""), category
+            ]).lower()
+            if q in searchable:
+                results.append(tip)
+                seen_titles.add(tip["title"])
+
+    # If query matches a category name, return all tips in that category
+    if not results:
+        for category, tips in LAB_TIPS.items():
+            if q in category.lower():
+                for tip in tips:
+                    if tip["title"] not in seen_titles:
+                        results.append(tip)
+                        seen_titles.add(tip["title"])
+
+    return results[:15]
+
+
+# =============================================================================
+# Hazardous Reagent Safety Cards (v7.1.0)
+# =============================================================================
+
+SAFETY_CARDS: list[dict] = [
+    {"reagent": "n-Butyllithium (n-BuLi)",
+     "hazards": "Pyrophoric (ignites in air), corrosive. Hexane/pentane solutions.",
+     "handling": "Schlenk line or glovebox. Sure/seal bottle + syringe. Sand bucket nearby (not water). Titrate before each use.",
+     "quench": "Add slowly to iPrOH at 0°C (controlled). Then wash with dilute HCl.",
+     "first_aid": "Skin: brush off solid, flush with water. Fire: smother with sand, CO2 extinguisher.",
+     "storage": "2-8°C under N2. Check concentration regularly."},
+    {"reagent": "t-Butyllithium (t-BuLi)",
+     "hazards": "EXTREMELY pyrophoric — ignites violently in air. Most dangerous common organolithium.",
+     "handling": "Double-tipped needle only. Never open to air. Work in hood with sash down. Sand bucket ready. ALWAYS use 2 equiv (first equiv quenches impurities).",
+     "quench": "iPrOH at -78°C, dropwise. NEVER add to halide solutions at RT (can cause fire).",
+     "first_aid": "Skin: flush with copious water. Fire: sand, CO2 extinguisher. Report immediately.",
+     "storage": "2-8°C under N2. Pentane solutions only (hexane crystallizes at low T)."},
+    {"reagent": "Lithium aluminum hydride (LAH, LiAlH4)",
+     "hazards": "Reacts violently with water (H2 gas + heat → fire). Pyrophoric as fine powder. Strong reductant.",
+     "handling": "Weigh under N2 blanket. Add to dry solvent (THF or Et2O), never add solvent to LAH. Cool to 0°C when adding substrates.",
+     "quench": "Fieser protocol (n:n:3n rule): n mL H2O, n mL 15% NaOH, 3n mL H2O (n = grams LAH). Add each DROPWISE at 0°C.",
+     "first_aid": "Fire: sand or CO2, never water on bulk LAH.",
+     "storage": "Desiccator under N2. Old LAH loses activity → grey/clumpy = degraded."},
+    {"reagent": "Sodium hydride (NaH)",
+     "hazards": "Reacts with water → H2 (fire risk). 60% dispersion in mineral oil is safer than dry NaH.",
+     "handling": "Wash oil dispersion with hexanes under N2 if dry NaH needed (rarely). Add to dry DMF/THF. H2 evolution — use N2-filled balloon to monitor.",
+     "quench": "Slowly add iPrOH or MeOH at 0°C until H2 evolution stops. Then cautious water addition.",
+     "first_aid": "Skin: brush off, flush with water.",
+     "storage": "RT under N2. Protect from moisture. 60% oil dispersion safest form."},
+    {"reagent": "Diazomethane (CH2N2)",
+     "hazards": "⚠️ TOXIC, EXPLOSIVE, CARCINOGENIC. Can detonate on contact with ground glass, rough surfaces, or heat.",
+     "handling": "Generate fresh from Diazald (safe precursor). Use smooth glassware only (no ground glass joints — use rubber sleeves). Work behind blast shield. Keep solutions in Et2O at 0°C. NEVER concentrate or distill.",
+     "quench": "Add AcOH dropwise (converts to methyl acetate + N2). Dilute solution only.",
+     "first_aid": "Inhalation: move to fresh air immediately. Seek medical attention.",
+     "storage": "Do not store. Generate fresh each time. Keep Et2O solutions at -20°C for max 24h."},
+    {"reagent": "Osmium tetroxide (OsO4)",
+     "hazards": "Highly toxic (TLV 0.002 mg/m³). Volatile. Causes irreversible eye damage (corneal ulceration). Readily absorbed through skin.",
+     "handling": "Double gloves (nitrile + butyl rubber). Work in fume hood only. Use catalytic amounts with stoichiometric co-oxidant (NMO). Weigh quickly in hood.",
+     "quench": "Add Na2SO3 or Na2S2O3 (reduces Os(VIII) to insoluble OsO2). Filter and dispose as heavy metal waste.",
+     "first_aid": "Eyes: immediate flush (15 min), seek ophthalmological evaluation. Skin: remove clothing, wash thoroughly.",
+     "storage": "Sealed ampoule in secondary container in fume hood. Solutions in t-BuOH more stable than aqueous."},
+    {"reagent": "Hydrofluoric acid (HF)",
+     "hazards": "⚠️ EXTREMELY DANGEROUS. Penetrates skin painlessly → systemic fluoride poisoning → cardiac arrest. Burns may not be immediately visible.",
+     "handling": "Requires specific HF training and medical protocol. Polyethylene or Teflon containers only (etches glass!). Double nitrile gloves + face shield + HF-rated apron.",
+     "quench": "Neutralize with CaCO3 or Ca(OH)2 slurry. Never pour down drain without treatment.",
+     "first_aid": "Apply calcium gluconate gel IMMEDIATELY (keep in lab near HF). Seek emergency medical attention even for minor exposures. Hospital monitoring required.",
+     "storage": "Polyethylene bottles in secondary containment. Designated HF storage area."},
+    {"reagent": "Sodium azide (NaN3)",
+     "hazards": "Toxic (LD50 ~27 mg/kg oral). Forms explosive heavy metal azides and volatile HN3 in acid. HN3 toxic (TLV 0.1 ppm) and explosive.",
+     "handling": "Never acidify. Never contact heavy metals (Pb, Cu, Ag pipes). Keep alkaline. Use in fume hood.",
+     "quench": "Destroy with NaNO2 in dilute H2SO4 or with bleach (NaOCl). Confirm destruction (test with FeCl3 → no red = azide destroyed).",
+     "first_aid": "Ingestion: seek immediate medical attention. Skin: wash thoroughly.",
+     "storage": "RT, away from acids and heavy metals. Clearly labeled."},
+    {"reagent": "Palladium on carbon (Pd/C)",
+     "hazards": "Pd/C loaded with H2 is pyrophoric. Can ignite spontaneously if allowed to dry while H2-saturated.",
+     "handling": "NEVER let Pd/C filter cake dry on the filter paper. Keep wet with solvent at all times. Filter under N2 atmosphere if possible. Wet filter cake → rinse into waste container with MeOH/H2O.",
+     "quench": "N/A for Pd itself. Spent Pd/C: keep wet, dispose as heavy metal waste.",
+     "first_aid": "Fire: smother with sand or CO2.",
+     "storage": "Store in closed container. Pd/C is reusable if activity hasn't dropped."},
+]
+
+
+def lookup_safety(query: str) -> list[dict]:
+    """Search safety cards by reagent name or keyword."""
+    q = query.lower().strip()
+    results = []
+    for card in SAFETY_CARDS:
+        searchable = " ".join([
+            card["reagent"], card["hazards"], card["handling"],
+            card.get("quench", ""), card.get("storage", ""),
+        ]).lower()
+        if q in searchable:
+            results.append(card)
+    return results
+
+
+# =============================================================================
+# Reaction Development Checklist (v7.2.0)
+# Based on: "Reaction Development: A Student's Checklist"
+# Kerr, Jenkinson, Sheridan & Sparr, Chem. Soc. Rev. 2025
+# DOI: 10.1039/D4CS01046A
+# =============================================================================
+
+REACTION_DEV_CHECKLIST: dict[str, dict] = {
+    "take_stock": {
+        "name": "Take Stock",
+        "icon": "🔍",
+        "summary": "Confirm product identity, mass balance, conditions necessity, reproducibility, and minimal retron before moving forward.",
+        "questions": [
+            {
+                "header": "Have you made the desired compound?",
+                "checks": [
+                    "Have you obtained a range of characterisation data? (¹H/¹³C NMR, HRMS, IR, mp)",
+                    "Have you obtained the X-ray crystal structure? (gold standard for connectivity & stereochemistry)",
+                ],
+                "tips": [
+                    "Minimum characterisation for new compounds: ¹H NMR, ¹³C NMR, HRMS. Most journals also require IR and melting point for solids.",
+                    "X-ray crystallography is the strongest proof of structure — pursue it for key compounds, especially if stereochemistry is in question.",
+                    "For oils/non-crystalline compounds, NOESY/ROESY experiments can establish relative stereochemistry.",
+                ],
+            },
+            {
+                "header": "Have you determined where all the atoms go?",
+                "checks": [
+                    "Can you write out a balanced equation?",
+                    "Where do all of the atoms in the product come from?",
+                    "What are the byproducts and side-products?",
+                    "Is there involvement from solvent, water or oxygen?",
+                ],
+                "tips": [
+                    "A balanced equation ensures your mechanism is plausible. If atoms appear or disappear, something is wrong.",
+                    "Isotope labelling (²H, ¹³C, ¹⁸O) can trace atom origins unambiguously.",
+                    "Adventitious O₂ or H₂O involvement is surprisingly common — run control experiments under rigorously anhydrous/anaerobic conditions.",
+                    "Side-products are mechanistically informative: characterise them, don't just discard.",
+                ],
+            },
+            {
+                "header": "Are all reaction conditions necessary?",
+                "checks": [
+                    "How long does it take to reach full conversion?",
+                    "Are you operating at the lowest feasible temperature?",
+                    "What is the lowest equivalency of reagent that can be used?",
+                    "Are all reagents required to achieve product formation?",
+                ],
+                "tips": [
+                    "Systematic omission experiments: remove each component one at a time and check if reaction still proceeds.",
+                    "Time course studies (TLC/HPLC/NMR monitoring at intervals) reveal optimal reaction time and whether over-reaction occurs.",
+                    "Excess reagent ≠ better yield. Optimise stoichiometry — excesses cause purification headaches and waste.",
+                ],
+            },
+            {
+                "header": "Is the reaction reproducible and robust?",
+                "checks": [
+                    "Can you reproduce the yield of the reaction?",
+                    "Can the purification conditions be reliably reproduced?",
+                    "Have you performed a sensitivity screen?",
+                ],
+                "tips": [
+                    "Reproduce your best result at least three times. Report average ± standard deviation.",
+                    "Glorius sensitivity screen: systematically test additives (H₂O, air, base, acid, radical inhibitors, etc.) to identify which impurities are tolerated or fatal.",
+                    "If yield varies between runs, investigate: reagent quality, solvent water content, inert atmosphere integrity, stirring efficiency.",
+                    "Record EVERYTHING: batch numbers, solvent lot, ambient temperature, humidity — hidden variables kill reproducibility.",
+                ],
+            },
+            {
+                "header": "Have you found the minimal synthon and retron?",
+                "checks": [
+                    "Can the substrate or reagents be simplified?",
+                    "Can the reactivity be extended to intermolecular systems?",
+                    "Is the minimal retron found in natural products?",
+                ],
+                "tips": [
+                    "Strip your substrate to the minimum structure that still reacts — this defines the retron.",
+                    "If your reaction is intramolecular, test whether an intermolecular variant is viable (often more useful).",
+                    "Search Reaxys or SciFinder for natural products containing your retron — this strengthens the 'Applications' section of your paper.",
+                ],
+            },
+        ],
+    },
+    "kinetics_thermodynamics": {
+        "name": "Kinetics & Thermodynamics",
+        "icon": "📈",
+        "summary": "Establish rate laws, driving forces, equilibrium control, and product stability to understand reactivity fundamentals.",
+        "questions": [
+            {
+                "header": "Can the rate law be determined?",
+                "checks": [
+                    "What reagents are involved in the rate-determining step?",
+                    "Can you calculate the rate constant?",
+                ],
+                "tips": [
+                    "Variable time normalisation analysis (VTNA) or reaction progress kinetic analysis (RPKA, Blackmond) are modern, experiment-efficient approaches to determining rate orders.",
+                    "Initial rates method: measure rate at varying [A] while keeping [B] constant, then vice versa.",
+                    "In situ IR (ReactIR), in situ NMR, or UV-vis monitoring can provide continuous kinetic data.",
+                ],
+            },
+            {
+                "header": "Can you increase the rate?",
+                "checks": [
+                    "What is the effect on the rate of increasing temperature?",
+                    "Can you harness the Thorpe-Ingold effect?",
+                ],
+                "tips": [
+                    "Arrhenius/Eyring analysis: measure rates at 3-5 temperatures to extract Ea or ΔG‡/ΔH‡/ΔS‡.",
+                    "Thorpe-Ingold (gem-disubstitution) effect: installing substituents on a tether can dramatically accelerate cyclisation reactions.",
+                    "Microwave heating, ultrasound, or flow chemistry can overcome kinetic barriers.",
+                ],
+            },
+            {
+                "header": "Have you established the steric sensitivity?",
+                "checks": [
+                    "What are the steric limits of the reaction?",
+                    "Can you favour reactivity using intramolecularisation?",
+                ],
+                "tips": [
+                    "Test substrates of increasing steric demand: Me < Et < iPr < tBu < Ad (or ortho-substituents in arenes).",
+                    "A-values and cone angles quantify steric demands — use Tolman cone angles for phosphine ligands.",
+                    "Intramolecular reactions benefit from effective molarity — can be 10³-10⁸ M higher than intermolecular equivalents.",
+                ],
+            },
+            {
+                "header": "Have you identified the reaction driving force?",
+                "checks": [
+                    "What is the thermodynamic driving force?",
+                    "Can you estimate the value of ΔH and ΔS?",
+                    "Can you run the reaction at a higher pressure?",
+                    "Can you destabilise the starting materials?",
+                ],
+                "tips": [
+                    "Common driving forces: aromatisation, ring strain release, gas evolution (N₂, CO₂, CO), precipitation, chelation.",
+                    "DFT calculations (B3LYP, ωB97X-D, M06-2X) with a good basis set can estimate ΔG reliably for organic reactions.",
+                    "Le Chatelier: remove product (distillation, precipitation, Dean-Stark) or use excess of cheap reagent to drive equilibria.",
+                    "High pressure favours reactions with negative ΔV‡ (bond-forming steps, cycloadditions).",
+                ],
+            },
+            {
+                "header": "Can you bias an equilibrium?",
+                "checks": [
+                    "Can you stabilise an intermediate at equilibrium?",
+                    "Can you evolve or precipitate the product or byproduct?",
+                ],
+                "tips": [
+                    "Dean-Stark trap: removes H₂O azeotropically — drives esterifications, imine formation, acetal formation.",
+                    "Molecular sieves: 3Å for H₂O, 4Å for larger molecules like MeOH.",
+                    "Product precipitation: choose solvent systems where the product crashes out (e.g., Suzuki coupling in aqueous conditions).",
+                ],
+            },
+            {
+                "header": "Is the intended product stable?",
+                "checks": [
+                    "Is the product stable under the reaction conditions?",
+                    "Does the product decompose, polymerise, or isomerise on standing?",
+                ],
+                "tips": [
+                    "Monitor product stability: re-submit product to reaction conditions and check for degradation.",
+                    "Some products are kinetic products — test thermal stability and check if thermodynamic products form over time.",
+                    "Protect sensitive products immediately after isolation (store under N₂, in dark, at low temperature as needed).",
+                ],
+            },
+        ],
+    },
+    "mechanism": {
+        "name": "Mechanism",
+        "icon": "⚙️",
+        "summary": "Gather experimental and computational evidence for the reaction mechanism — KIE, spectroscopy, radical clocks, Hammett, computation.",
+        "questions": [
+            {
+                "header": "Do you have evidence for the mechanism?",
+                "checks": [
+                    "Can you measure kinetic isotope effects (KIE)?",
+                    "Can you monitor the reaction with in situ spectroscopy?",
+                    "Are the bond forming steps concerted or stepwise?",
+                    "Can you conceive of a radical clock experiment?",
+                    "Can you measure the quantum yield of the reaction?",
+                    "Can you estimate the frontier molecular orbitals?",
+                    "Can you probe the reaction with UV-vis spectroscopy?",
+                    "Can you calculate the triplet energy of the substrates?",
+                    "Can you perform a Hammett analysis?",
+                    "Can you analyse the kinetic profile of the reaction?",
+                    "Can you measure redox potentials with cyclic voltammetry?",
+                    "Can you perform a Stern-Volmer quenching study?",
+                ],
+                "tips": [
+                    "KIE: kH/kD > 2 suggests C-H bond cleavage in/before the RDS. Use deuterated substrates.",
+                    "Radical clocks: cyclopropylmethyl radical ring-opens at ~10⁸ s⁻¹ — use to test for radical intermediates.",
+                    "Hammett analysis: ρ > 0 = negative charge builds in RDS; ρ < 0 = positive charge builds. Use σ, σ⁺, or σ⁻ depending on mechanism.",
+                    "Stern-Volmer: if Ksv is linear, single-quenching pathway. Deviation = multiple pathways or static quenching.",
+                    "Cyclic voltammetry: measure E₁/₂ of substrates vs catalyst to assess thermodynamic feasibility of SET steps.",
+                    "Quantum yield Φ > 1 indicates a radical chain mechanism. Φ < 1 indicates stoichiometric photon consumption.",
+                    "In situ IR (ReactIR) can track functional group appearance/disappearance in real time.",
+                ],
+            },
+            {
+                "header": "Have the intermediates been identified?",
+                "checks": [
+                    "Can an intermediate be isolated or detected by spectroscopy?",
+                    "Can you intercept an intermediate using a trapping agent?",
+                ],
+                "tips": [
+                    "Common trapping agents: TEMPO (radicals), BHT (radicals), 1,1-diphenylethylene (radicals), dienes (carbenes/nitrenes), furan (arynes).",
+                    "Low-temperature NMR (down to -100°C in CD₂Cl₂) can detect fleeting intermediates.",
+                    "Mass spectrometry (ESI-MS, MALDI) can detect charged intermediates directly from reaction mixtures.",
+                    "Crossover experiments: mix two substrates and check for scrambled products to distinguish intra- vs intermolecular pathways.",
+                ],
+            },
+            {
+                "header": "Can the reaction pathway be computed?",
+                "checks": [
+                    "Are the proposed transition state energies feasible?",
+                    "Can you rationalise selectivity using computation?",
+                ],
+                "tips": [
+                    "DFT methods for organic mechanisms: M06-2X/6-311+G(d,p) or ωB97X-D/def2-TZVP with SMD solvation.",
+                    "Transition state barriers: ΔG‡ < 25 kcal/mol feasible at RT; 25-35 kcal/mol requires heating; > 35 kcal/mol unlikely.",
+                    "For selectivity: compute competing transition states; ΔΔG‡ = 1.4 kcal/mol ≈ 10:1 selectivity at RT.",
+                    "NCI (non-covalent interaction) analysis and distortion/interaction analysis can rationalise selectivity origins.",
+                    "Tools: Gaussian, ORCA (free for academics), Psi4 (open source). CREST for conformer sampling.",
+                ],
+            },
+            {
+                "header": "Is there a better route to the active species?",
+                "checks": [
+                    "Can the route to the active species be simplified?",
+                    "How does the method compare to similar transformations?",
+                ],
+                "tips": [
+                    "Well-defined catalysts (e.g., Pd-PEPPSI, XPhos-Pd-G3/G4) often outperform in situ-generated species.",
+                    "Pre-catalyst activation studies: monitor by NMR or UV-vis which species forms on mixing catalyst + ligand + base.",
+                    "Literature comparison: tabulate your method vs existing methods (yield, scope, conditions, catalyst loading, functional group tolerance).",
+                ],
+            },
+        ],
+    },
+    "optimisation": {
+        "name": "Optimisation",
+        "icon": "📊",
+        "summary": "Systematically maximise yield, achieve selectivity, and improve protocol efficiency and sustainability.",
+        "questions": [
+            {
+                "header": "Has the yield been fully maximised?",
+                "checks": [
+                    "Reaction time",
+                    "Temperature",
+                    "Stoichiometry",
+                    "Concentration",
+                    "Catalyst loading",
+                    "Solvent",
+                    "Mixing rate",
+                    "Reagent addition rate",
+                    "Pressure",
+                    "Solution pH",
+                ],
+                "extra_checks": [
+                    "Reagent addition order",
+                    "Additives",
+                    "Reaction atmosphere (air, N₂, Ar, O₂, H₂)",
+                    "Wavelength of light",
+                    "Light intensity",
+                    "Number of light sources",
+                    "Waste production",
+                    "Electrode material",
+                    "Current density",
+                    "Inter-electrode distance",
+                    "Residence time (flow)",
+                    "Flow rate",
+                    "Sustainability",
+                    "Reaction cost",
+                ],
+                "tips": [
+                    "Design of Experiments (DoE): use factorial designs to explore parameter space efficiently rather than one-variable-at-a-time (OVAT).",
+                    "Optimise in this order: solvent → temperature → stoichiometry → concentration → catalyst loading → additives → time.",
+                    "For photochemistry: light intensity, wavelength, distance to light source, and reactor geometry all matter enormously.",
+                    "For electrochemistry: electrode material, current density, electrolyte, cell geometry, and divided vs undivided cell are critical.",
+                    "For flow chemistry: residence time, temperature, back-pressure, and mixing efficiency replace batch parameters.",
+                ],
+            },
+            {
+                "header": "Can reaction selectivity be achieved?",
+                "checks": [
+                    "Can chemo-/regio- or diastereoselectivity be achieved?",
+                    "Can the reaction be rendered enantioselective?",
+                    "Can the conditions access divergent reactivity?",
+                ],
+                "tips": [
+                    "Chemoselectivity: tune reagent strength, temperature, or protecting groups to differentiate similar functional groups.",
+                    "For enantioselectivity: screen chiral ligand families (BINAP, PHOX, BOX, cinchona alkaloids, NHC, CPA) systematically.",
+                    "Temperature often affects dr/ee: lower temperature → higher selectivity (kinetic control).",
+                    "Solvent can switch selectivity: polar solvents favour charged transition states, non-polar favour non-polar TS.",
+                ],
+            },
+            {
+                "header": "Can the protocol be more efficient?",
+                "checks": [
+                    "Can you compare PMI and E-Factor to similar syntheses?",
+                    "Can the reaction be run in air or at ambient temperature?",
+                    "Can any step of the procedure be automated?",
+                    "Can the reaction be performed with less toxic reagents?",
+                ],
+                "tips": [
+                    "Process Mass Intensity (PMI) = total mass in / mass product. E-factor = mass waste / mass product. Lower = greener.",
+                    "ACS GCI Roundtable solvent selection guide: replace DCM → 2-MeTHF or EtOAc; DMF → DMAc or NMP (or better, avoid dipolar aprotirs).",
+                    "If your reaction works under air, SAY SO prominently — this is a huge practical advantage.",
+                    "Automation: DoE software, automated sampling, or synthesis robots (Chemspeed, Mettler EasyMax) can accelerate optimisation enormously.",
+                ],
+            },
+        ],
+    },
+    "catalysis": {
+        "name": "Catalysis",
+        "icon": "🔄",
+        "summary": "Establish catalytic cycles, identify active species, achieve enantioselective catalysis, and optimise turnover.",
+        "questions": [
+            {
+                "header": "Can the reaction be catalysed?",
+                "checks": [
+                    "Can the reaction be catalysed by an enzyme?",
+                    "Can a reagent be turned over using a redox agent?",
+                    "Can the reaction be catalysed in the excited state?",
+                    "Have you confirmed the existence of a catalytic cycle?",
+                ],
+                "tips": [
+                    "Catalytic cycle proof: show that product forms with sub-stoichiometric catalyst AND that catalyst can be recovered/reused.",
+                    "Turnover experiments: monitor product formation over time — linear growth = catalytic; levelling off = catalyst death.",
+                    "For photoredox: confirm that both light AND photocatalyst are required (control experiments in dark, without catalyst).",
+                    "Electrochemistry can replace stoichiometric oxidants/reductants — consider if your reagent serves only as an electron shuttle.",
+                ],
+            },
+            {
+                "header": "Have you identified the catalytically active species?",
+                "checks": [
+                    "Can you detect the active species using spectroscopy?",
+                    "Can you find a relationship between pre-catalyst and active catalyst?",
+                    "Are nanoparticles responsible for catalytic activity?",
+                    "Can a better strategy to form the active catalyst be conceived?",
+                ],
+                "tips": [
+                    "Mercury drop test: Hg(0) amalgamates with Pd nanoparticles → if reaction stops, nanoparticles were the active catalyst.",
+                    "Hot filtration test: remove solid catalyst mid-reaction; if reaction continues in filtrate, homogeneous species are active.",
+                    "Kinetic induction period = slow activation of pre-catalyst. Sigmoidal kinetics may indicate nanoparticle formation.",
+                    "For Pd catalysis: Pd(0) nanoparticles vs molecular Pd(0) is a perennial debate — test with substoichiometric PVP or polymer-supported scavengers.",
+                ],
+            },
+            {
+                "header": "Can you catalyse the reaction enantioselectively?",
+                "checks": [
+                    "Can the reaction be used for desymmetrisation?",
+                    "Can an organocatalyst be employed?",
+                    "Is there a relationship between sterics and enantioselectivity?",
+                    "Have you identified the enantiodetermining step?",
+                ],
+                "tips": [
+                    "Non-linear effects (NLE): if ee(product) vs ee(ligand) is non-linear, dimeric or oligomeric catalyst species may be involved.",
+                    "Ligand-accelerated catalysis: if chiral ligand makes reaction faster AND more selective, this simplifies practical use.",
+                    "Desymmetrisation of meso compounds gives enantiopure products from achiral starting materials — powerful strategy.",
+                    "Temperature-dependent ee: plot ln(er) vs 1/T — reveals whether ΔΔH‡ or ΔΔS‡ dominates selectivity.",
+                ],
+            },
+            {
+                "header": "Is the catalyst turnover optimal?",
+                "checks": [
+                    "Can Turnover Number (TON) be calculated?",
+                    "Can catalyst deactivation pathways be suppressed?",
+                    "Can you reduce the use of precious metals?",
+                    "Is there a relationship between ligand identity and TON?",
+                ],
+                "tips": [
+                    "TON = mol product / mol catalyst. TOF = TON / time. For Pd: TON > 1000 is good; > 10,000 is excellent for applications.",
+                    "Common deactivation: aggregation to Pd black, oxidation, ligand dissociation, product inhibition.",
+                    "Slow addition of catalyst or substrate can improve TON by keeping [catalyst] low and minimising decomposition.",
+                    "Earth-abundant metal alternatives: Fe, Cu, Ni, Co, Mn — growing rapidly and increasingly competitive with Pd, Ir, Rh.",
+                ],
+            },
+        ],
+    },
+    "scope": {
+        "name": "Scope",
+        "icon": "🎯",
+        "summary": "Demonstrate substrate generality, functional group tolerance, and define the parameters that govern reactivity.",
+        "questions": [
+            {
+                "header": "Is the substrate scope diverse?",
+                "checks": [
+                    "Have you explored a wide range of substrates?",
+                    "Have you attempted to eliminate selection and reporting bias?",
+                    "Can complex substrates be tolerated?",
+                    "Have a variety of steric environments been explored?",
+                    "Have you reported the 'negative' results?",
+                    "Has a standardised scope selection model been used?",
+                ],
+                "tips": [
+                    "Report failures! Substrates that don't work are as informative as those that do, and reviewers appreciate honesty.",
+                    "Selection bias: don't just pick substrates that work well — include challenging ones (ortho-substituted, heteroaromatics, aliphatics).",
+                    "Glorius/Collins 'informer library': standardised substrate sets that probe electronic, steric, and FG tolerance systematically.",
+                    "For arene scope: include electron-rich (OMe, NMe₂), electron-poor (NO₂, CF₃, CN), and halogenated (F, Cl, Br) examples at ortho/meta/para.",
+                    "For alkyl scope: include 1°, 2°, 3° substrates and β-branched examples to probe steric limits.",
+                    "Complex substrates (drug molecules, natural products) demonstrate real-world applicability — even 1-2 examples are valuable.",
+                ],
+            },
+            {
+                "header": "Have you shown functional group tolerance?",
+                "checks": [
+                    "Can the reaction tolerate nucleophiles or electrophiles?",
+                    "Can you tolerate substrates that can be oxidised or reduced?",
+                    "Can you tolerate Lewis acids and Lewis bases?",
+                    "Can you tolerate fragments found frequently in drugs?",
+                    "Can the reaction be performed in a range of solvents?",
+                    "Have you employed a robustness screen?",
+                ],
+                "tips": [
+                    "Glorius robustness screen: add 1 equiv of additive (amine, alcohol, ketone, alkene, thiol, etc.) to standard reaction and measure yield + recovery.",
+                    "Drug-like fragments to test: pyridine, piperidine, morpholine, thiophene, indole, free NH, free OH, unprotected amine.",
+                    "Reducible groups: alkene, alkyne, nitro, azide, carbonyl. Oxidisable groups: thioether, amine, alcohol, aldehyde.",
+                    "If you use a protecting group in scope, also show an example without it — reviewers will ask.",
+                ],
+            },
+            {
+                "header": "Have you defined the parameters of reactivity?",
+                "checks": [
+                    "Can you define a pKa range in which reactivity is observed?",
+                    "Is there a steric limit to reactivity?",
+                    "Can you define a redox window for the starting materials?",
+                    "Have you considered the mechanistic implications of the scope?",
+                    "Can the Mayr scale be used to define the limits of electrophilicity, nucleophilicity and radical philicity?",
+                ],
+                "tips": [
+                    "Mayr nucleophilicity/electrophilicity scales (mayr.uni-muenchen.de): if log k = s(N+E), you can predict whether a reaction is feasible.",
+                    "pKa range: if reaction works for substrates with pKa 10-15 but fails at pKa > 20, this defines the deprotonation step's limits.",
+                    "Redox window: measure E₁/₂ by CV for substrates that work vs those that fail — defines SET thermodynamic requirements.",
+                    "Steric maps: correlate %Vbur (percent buried volume) or Sterimol parameters with yield to quantify steric limits.",
+                    "Hammett/Swain-Lupton correlations (σ, F, R) can separate electronic field vs resonance effects on reactivity.",
+                ],
+            },
+        ],
+    },
+    "applications": {
+        "name": "Applications",
+        "icon": "🚀",
+        "summary": "Demonstrate utility in synthesis, late-stage functionalisation, derivatisation, bioconjugation, and materials chemistry.",
+        "questions": [
+            {
+                "header": "Can it be used to access target compounds?",
+                "checks": [
+                    "Can the reaction be applied to natural product synthesis?",
+                    "Can the reaction be used to access motifs found in drugs?",
+                    "Can you access building blocks for functional materials?",
+                ],
+                "tips": [
+                    "Search SciFinder/Reaxys for natural products and drugs containing your product's structural motif.",
+                    "Even a formal synthesis (making a known intermediate) counts. Total synthesis is ideal but not required.",
+                    "Biologically active scaffolds: show bioactivity data if available, or reference known actives with similar structures.",
+                    "Materials applications: show optical/electronic properties (UV-vis, fluorescence, CV) if your products have extended conjugation.",
+                ],
+            },
+            {
+                "header": "Can it be used for late-stage transformations?",
+                "checks": [
+                    "Can the reaction tolerate dense functionality?",
+                    "Can the reaction be used for skeletal editing?",
+                ],
+                "tips": [
+                    "Late-stage functionalisation (LSF): apply your reaction to a complex drug molecule (e.g., from the Pfizer diversinate set).",
+                    "Skeletal editing: single-atom insertion, deletion, or swap in heteroaromatic rings — transformative for medicinal chemistry.",
+                    "Even modest yields on complex substrates are noteworthy if the transformation is otherwise impossible.",
+                ],
+            },
+            {
+                "header": "Can the products be derivatised?",
+                "checks": [
+                    "Do you form a linchpin group that can be further reacted?",
+                    "Can functional group interconversion be demonstrated?",
+                    "Can the reaction be used as part of a cascade?",
+                ],
+                "tips": [
+                    "Versatile handles: boronic esters (Suzuki), vinyl (Heck/metathesis), halides (cross-coupling), azides (click), aldehydes (diverse chemistry).",
+                    "Show 2-3 downstream transformations to demonstrate product versatility — a 'product derivatisation' scheme is standard.",
+                    "Cascade/domino sequences incorporating your reaction increase step-efficiency and impact.",
+                ],
+            },
+            {
+                "header": "Can it be used for bioconjugation?",
+                "checks": [
+                    "Are the conditions suitably mild for in vivo functionalisation?",
+                    "Can the reaction target a native amino acid side chain?",
+                    "Can the reaction be run in a cell or in an organism?",
+                    "Can click-type reactivity between biomolecules be achieved?",
+                ],
+                "tips": [
+                    "Bioconjugation requirements: aqueous, pH 6-8, < 37°C, fast (minutes), selective in presence of thiols/amines/carboxylates.",
+                    "Targetable residues: Cys (thiol), Lys (amine), Tyr (phenol), Trp (indole), Met (thioether), His (imidazole).",
+                    "Bioorthogonal = no cross-reactivity with biological functional groups. Gold standard: SPAAC, iEDDA (tetrazine-TCO), Staudinger.",
+                ],
+            },
+            {
+                "header": "Can it be used in materials chemistry?",
+                "checks": [
+                    "Can the reaction be used to depolymerise plastics?",
+                    "Can the functionalisation of a plastic be achieved?",
+                ],
+                "tips": [
+                    "Polymer applications: post-polymerisation modification, monomer synthesis, depolymerisation (circular economy is hot).",
+                    "Demonstrate scalability (> 1 g, ideally 10 g+) for materials applications.",
+                    "Surface functionalisation: show that your chemistry works on solid supports, films, or nanoparticles.",
+                ],
+            },
+        ],
+    },
+}
+
+
+def lookup_rxn_dev_checklist(query: str) -> list[dict]:
+    """Search the reaction development checklist by keyword or section name."""
+    q = query.lower().strip()
+    results = []
+
+    # First: check if query matches a section key or name
+    for key, section in REACTION_DEV_CHECKLIST.items():
+        if q in key or q in section["name"].lower():
+            results.append({
+                "section": section["name"],
+                "icon": section["icon"],
+                "summary": section["summary"],
+                "questions": section["questions"],
+                "match_type": "section",
+            })
+
+    # Second: search within questions/checks/tips
+    if not results:
+        for key, section in REACTION_DEV_CHECKLIST.items():
+            for qblock in section["questions"]:
+                searchable = " ".join([
+                    qblock["header"],
+                    " ".join(qblock.get("checks", [])),
+                    " ".join(qblock.get("extra_checks", [])),
+                    " ".join(qblock.get("tips", [])),
+                ]).lower()
+                if q in searchable:
+                    results.append({
+                        "section": section["name"],
+                        "icon": section["icon"],
+                        "header": qblock["header"],
+                        "checks": qblock.get("checks", []),
+                        "extra_checks": qblock.get("extra_checks", []),
+                        "tips": qblock.get("tips", []),
+                        "match_type": "question",
+                    })
+
+    return results[:20]
+
+
+def get_all_checklist_sections() -> list[str]:
+    """Return all section names for the reaction development checklist."""
+    return [f"{s['icon']} {s['name']}" for s in REACTION_DEV_CHECKLIST.values()]
+
+
+
+
