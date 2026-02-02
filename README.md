@@ -116,7 +116,7 @@ docker run -it labmate-mcp
 Restart Claude. **61 of 81 tools work out of the box** — no API keys needed.
 
 > [!TIP]
-> Want retrosynthesis, pKa prediction, or NMR shifts? Add [free API keys](#%EF%B8%8F-configuration) for IBM RXN and Rowan Science.
+> Want retrosynthesis, pKa prediction, or NMR shifts? Run `labmate-mcp --setup` to add free API keys.
 
 ---
 
@@ -421,19 +421,41 @@ Claude: [word limits, abstract format, citation style, graphical abstract specs]
 
 ## ⚙️ Configuration
 
-**All environment variables are optional.** The server runs out of the box.
+The easiest way to add API keys:
+
+```bash
+labmate-mcp --setup
+```
+
+This walks you through each key and saves them to `~/.labmate-mcp.env`. They're loaded automatically whenever you use labmate.
+
+**All keys are optional.** 61 of 81 tools work without any configuration.
+
+<details>
+<summary><b>Available API keys</b></summary>
+
+<br>
 
 | Variable | Service | Free? | What it unlocks |
 |:---------|:--------|:-----:|:----------------|
+| `RXN_API_KEY` | [IBM RXN](https://rxn.res.ibm.com) | ✅ | Retrosynthesis, product prediction, atom mapping |
+| `ROWAN_API_KEY` | [Rowan Science](https://rowan.ai) | ✅ | pKa, solubility, ADMET, tautomers, NMR prediction |
 | `SEMANTIC_SCHOLAR_API_KEY` | [Semantic Scholar](https://www.semanticscholar.org/product/api#api-key) | ✅ | Higher rate limits for citations & recommendations |
 | `UNPAYWALL_EMAIL` | [Unpaywall](https://unpaywall.org/) | ✅ | Open access PDF discovery |
-| `RXN4CHEMISTRY_API_KEY` | [IBM RXN](https://rxn.res.ibm.com) | ✅ | Retrosynthesis, product prediction, atom mapping |
-| `ROWAN_API_KEY` | [Rowan Science](https://rowan.ai) | ✅ | pKa, solubility, ADMET, tautomers, NMR prediction |
 | `MATERIALS_PROJECT_API_KEY` | [Materials Project](https://materialsproject.org) | ✅ | Crystal structures, band gaps, formation energies |
 | `WOS_API_KEY` | [Web of Science](https://developer.clarivate.com) | 🏛️ | Web of Science search (institutional) |
 | `COMPTOX_API_KEY` | [EPA CompTox](mailto:ccte_api@epa.gov) | ✅ | Toxicity & environmental data |
 
-**Aliases:** `S2_API_KEY` / `SEMANTIC_SCHOLAR_API_KEY`, `MP_API_KEY` / `MATERIALS_PROJECT_API_KEY`, `RXN_API_KEY` / `RXN4CHEMISTRY_API_KEY` all work.
+**Aliases:** `S2_API_KEY`, `MP_API_KEY`, `RXN4CHEMISTRY_API_KEY` also work.
+
+</details>
+
+<details>
+<summary><b>Manual configuration</b></summary>
+
+<br>
+
+If you prefer to configure keys manually, add them to your Claude config:
 
 ```json
 {
@@ -449,6 +471,15 @@ Claude: [word limits, abstract format, citation style, graphical abstract specs]
   }
 }
 ```
+
+Or create `~/.labmate-mcp.env` directly:
+
+```bash
+RXN_API_KEY=your-rxn-key
+ROWAN_API_KEY=your-rowan-key
+```
+
+</details>
 
 ---
 
