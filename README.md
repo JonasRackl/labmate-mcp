@@ -1,89 +1,139 @@
 <div align="center">
 
-# 🧪 labmate-mcp
+<br>
 
-**Your AI lab companion — from literature search to benchwork to publication.**
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/badge/%F0%9F%A7%AA_labmate--mcp-Your_AI_Lab_Companion-0d1117?style=for-the-badge&labelColor=161b22">
+  <img alt="labmate-mcp" src="https://img.shields.io/badge/%F0%9F%A7%AA_labmate--mcp-Your_AI_Lab_Companion-f6f8fa?style=for-the-badge&labelColor=eaeef2">
+</picture>
 
-[![PyPI](https://img.shields.io/pypi/v/labmate-mcp?color=blue&label=PyPI)](https://pypi.org/project/labmate-mcp/)
-[![Python](https://img.shields.io/badge/Python-3.10+-blue)](https://python.org)
-[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
-[![Tools](https://img.shields.io/badge/Tools-78-orange)](#-tool-reference)
-[![Named Reactions](https://img.shields.io/badge/Named_Reactions-151-purple)](#-bench-chemistry--reference-10-tools)
+### From literature search to benchwork to publication.
 
-**78 tools** · **25+ scientific APIs** · **151 named reactions** · **Zero config required**
+<br>
 
-[Install](#-install) · [What Can I Do?](#-what-can-i-do-with-this) · [All Tools](#-tool-reference) · [Configuration](#%EF%B8%8F-configuration) · [Examples](#-examples)
+[![PyPI version](https://img.shields.io/pypi/v/labmate-mcp?style=flat-square&color=3572A5&label=PyPI)](https://pypi.org/project/labmate-mcp/)
+[![Downloads](https://img.shields.io/pypi/dm/labmate-mcp?style=flat-square&color=3572A5&label=Downloads)](https://pypi.org/project/labmate-mcp/)
+[![Python](https://img.shields.io/badge/Python-3.10+-3572A5?style=flat-square)](https://python.org)
+[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
+
+<br>
+
+**81 tools** &nbsp;·&nbsp; **25+ scientific APIs** &nbsp;·&nbsp; **202 named reactions** &nbsp;·&nbsp; **14k lines of code** &nbsp;·&nbsp; **zero config required**
+
+<br>
+
+[**Quick Start ↓**](#-quick-start) &nbsp;&nbsp;•&nbsp;&nbsp; [What Can I Do?](#-what-can-i-do-with-this) &nbsp;&nbsp;•&nbsp;&nbsp; [All 81 Tools](#-tool-reference) &nbsp;&nbsp;•&nbsp;&nbsp; [Configuration](#%EF%B8%8F-configuration) &nbsp;&nbsp;•&nbsp;&nbsp; [Examples](#-examples)
+
+<br>
 
 </div>
 
 ---
 
-labmate-mcp is an [MCP server](https://modelcontextprotocol.io) that plugs into Claude and gives it deep access to scientific databases, computational chemistry, bench references, and writing utilities. **One install covers the entire research workflow.**
+labmate-mcp is an [MCP server](https://modelcontextprotocol.io) that gives Claude deep access to scientific databases, computational chemistry, bench references, and writing utilities. **One install covers the entire research workflow** — from finding papers to writing them up.
 
-```
-📚 Literature        ⚗️ Synthesis         🧪 Bench             📊 Analysis          ✍️ Publication
-Search papers        Retrosynthesis       Named reactions      Isotope patterns     Format citations
-Citation graphs      Forward prediction   Reagent calculator   Mass spectra         Build bibliography
-Author profiles      Atom mapping         Protecting groups    Binding data         Experimental templates
-Preprints            pKa / ADMET          Solvent reference    Crystal structures   Journal guides
-Open access PDFs     NMR prediction       TLC / Column         Safety data          SI checklist
-     15 tools             11 tools             27 tools             15 tools             10 tools
-```
+<div align="center">
 
----
+<br>
 
-## 💬 What Can I Do With This?
+<table>
+<tr>
+<td align="center" width="20%">
 
-Once installed, just talk to Claude naturally. Here are real things you can ask:
+**📚 Literature**<br>
+<sub>15 tools</sub>
 
-> **"Search for recent papers on copper-catalyzed C–H activation and show me the top 5 most cited"**
->
-> → Searches Crossref + OpenAlex + Semantic Scholar, ranks by citations, shows abstracts
+</td>
+<td align="center" width="20%">
 
-> **"I need to do a Suzuki coupling with 150 mg of my aryl bromide (MW 261). Calculate the amounts for Pd(PPh₃)₄ (5 mol%), boronic acid (1.3 eq), and K₂CO₃ (2.5 eq)"**
->
-> → Returns exact masses, mmol, with the substrate as limiting reagent
+**⚗️ Synthesis**<br>
+<sub>11 tools</sub>
 
-> **"What's the best protecting group for a primary amine if I need it stable to acidic conditions but removable with Pd/C hydrogenation?"**
->
-> → Searches 30 PGs with stability matrix, suggests Cbz
+</td>
+<td align="center" width="20%">
 
-> **"Format these DOIs as an ACS-style bibliography: 10.1021/jacs.1c12345, 10.1002/anie.202112345"**
->
-> → Returns numbered, journal-formatted reference list
+**🧪 Bench**<br>
+<sub>30 tools</sub>
 
-> **"I'm writing up my experimental section. Give me a template for a Buchwald-Hartwig amination"**
->
-> → Fill-in-the-blank template following journal conventions, with safety notes
+</td>
+<td align="center" width="20%">
 
-> **"Look up the NMR solvent peaks for DMSO-d6 — I see something at 2.50 ppm and want to make sure it's just residual solvent"**
->
-> → Residual ¹H: 2.50 ppm (quintet), ¹³C: 39.52 ppm, water: 3.33 ppm
+**📊 Analysis**<br>
+<sub>15 tools</sub>
 
-> **"Generate a peptide library of 20 cyclic pentapeptides with at least one D-amino acid"**
->
-> → Creates SMILES strings with properties (MW, logP, TPSA) for each
+</td>
+<td align="center" width="20%">
 
-> **"I'm submitting to JACS. What are the formatting requirements and word limits?"**
->
-> → Full guide: 5000-word limit, superscript numerals, 300-word abstract, graphical abstract specs
+**✍️ Publication**<br>
+<sub>10 tools</sub>
 
----
+</td>
+</tr>
+<tr>
+<td align="center"><sub>
 
-## 📦 Install
+Search papers<br>
+Citation graphs<br>
+Author profiles<br>
+Preprints<br>
+Open access PDFs
+
+</sub></td>
+<td align="center"><sub>
+
+Retrosynthesis<br>
+Forward prediction<br>
+Atom mapping<br>
+pKa / ADMET<br>
+NMR prediction
+
+</sub></td>
+<td align="center"><sub>
+
+Named reactions<br>
+Reagent calculator<br>
+Protecting groups<br>
+Solvent reference<br>
+Rxn dev checklist
+
+</sub></td>
+<td align="center"><sub>
+
+Isotope patterns<br>
+Mass spectra<br>
+Binding data<br>
+Crystal structures<br>
+Safety data
+
+</sub></td>
+<td align="center"><sub>
+
+Format citations<br>
+Build bibliography<br>
+Experimental templates<br>
+Journal guides<br>
+SI checklist
+
+</sub></td>
+</tr>
+</table>
+
+<br>
+
+</div>
+
+## 🚀 Quick Start
 
 ```bash
 pip install labmate-mcp
 ```
 
-That's it. **58 of 78 tools work immediately — no API keys, no configuration.**
-
-### Connect to Claude
-
-Add this to your Claude config file:
+Then add this to your Claude config:
 
 <details>
-<summary><b>Claude Desktop</b> — <code>claude_desktop_config.json</code></summary>
+<summary><b>Claude Desktop</b> &nbsp;→&nbsp; <code>claude_desktop_config.json</code></summary>
+
+<br>
 
 On macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
 On Windows: `%APPDATA%\Claude\claude_desktop_config.json`
@@ -101,7 +151,9 @@ On Windows: `%APPDATA%\Claude\claude_desktop_config.json`
 </details>
 
 <details>
-<summary><b>Claude Code</b> — <code>.mcp.json</code> in your project root</summary>
+<summary><b>Claude Code</b> &nbsp;→&nbsp; <code>.mcp.json</code> in your project root</summary>
+
+<br>
 
 ```json
 {
@@ -118,6 +170,8 @@ On Windows: `%APPDATA%\Claude\claude_desktop_config.json`
 <details>
 <summary><b>Docker</b></summary>
 
+<br>
+
 ```bash
 docker build -t labmate-mcp .
 docker run -it labmate-mcp
@@ -125,31 +179,78 @@ docker run -it labmate-mcp
 
 </details>
 
-Restart Claude after adding the config. You should see labmate's 78 tools available.
+<br>
 
-### Optional: Add API keys for more tools
+Restart Claude. **61 of 81 tools work immediately** — no API keys needed.
 
-```json
-{
-  "mcpServers": {
-    "labmate": {
-      "command": "labmate-mcp",
-      "env": {
-        "SEMANTIC_SCHOLAR_API_KEY": "your-key",
-        "UNPAYWALL_EMAIL": "you@university.edu"
-      }
-    }
-  }
-}
-```
+> [!TIP]
+> Want retrosynthesis, pKa prediction, or NMR shifts? Add [free API keys](#%EF%B8%8F-configuration) for IBM RXN and Rowan Science.
 
-See [Configuration](#%EF%B8%8F-configuration) for the full list.
+---
+
+## 💬 What Can I Do With This?
+
+Just talk to Claude naturally. Some examples:
+
+<table>
+<tr><td>
+
+> **"Search for recent papers on copper-catalyzed C–H activation and show me the top 5 most cited"**
+
+Searches Crossref + OpenAlex + Semantic Scholar, ranks by citations, shows abstracts and TLDRs.
+
+</td></tr>
+<tr><td>
+
+> **"I need to do a Suzuki coupling with 150 mg of my aryl bromide (MW 261). Calculate amounts for Pd(PPh₃)₄ (5 mol%), boronic acid (1.3 eq), and K₂CO₃ (2.5 eq)"**
+
+Returns exact masses in mg, mmol values, and volume if a solution — with your substrate as limiting reagent.
+
+</td></tr>
+<tr><td>
+
+> **"I'm optimising a new reaction. Walk me through the reaction development checklist"**
+
+30-question checklist from [*Chem. Soc. Rev.* 2025](https://doi.org/10.1039/D4CS01046A): kinetics, mechanism, DoE, catalysis, scope — with 126 actionable checks and 115 practical tips.
+
+</td></tr>
+<tr><td>
+
+> **"What's the best protecting group for a primary amine if I need it stable to acid but removable by hydrogenation?"**
+
+Searches 30 PGs with a stability matrix (acid / base / nucleophile / oxidation / reduction / H₂-Pd) and recommends Cbz.
+
+</td></tr>
+<tr><td>
+
+> **"Format these 12 DOIs as an ACS bibliography, then give me a Buchwald–Hartwig experimental template"**
+
+Crossref content negotiation → numbered reference list, plus a fill-in-the-blank template with safety notes.
+
+</td></tr>
+</table>
+
+<details>
+<summary><b>More things you can ask</b></summary>
+
+<br>
+
+| Ask Claude… | What happens |
+|:---|:---|
+| "Look up the NMR solvent peaks for DMSO-d₆" | Residual ¹H: 2.50 ppm (quintet), ¹³C: 39.52 ppm, water: 3.33 ppm |
+| "Generate 20 cyclic pentapeptides with D-amino acids" | SMILES strings + MW, logP, TPSA for each |
+| "I'm submitting to JACS — what are the requirements?" | 5000-word limit, superscript numerals, 300-word abstract, graphical abstract specs |
+| "Predict the retrosynthesis of ibuprofen" | Multi-step route from commercial starting materials |
+| "What's the pKa of 4-nitrophenol?" | Quantum-chemistry prediction via Rowan Science |
+| "Give me a cooling bath recipe for −42 °C" | MeCN / dry ice, or chlorobenzene / dry ice |
+
+</details>
 
 ---
 
 ## 🔧 Tool Reference
 
-### 📚 Literature & Discovery (15 tools)
+### 📚 Literature & Discovery — 15 tools
 
 Search papers across multiple databases, explore citation graphs, find open access PDFs, and track research trends.
 
@@ -176,7 +277,7 @@ Search papers across multiple databases, explore citation graphs, find open acce
 
 </details>
 
-### 🔬 Compound Data & Safety (12 tools)
+### 🔬 Compound Data & Safety — 12 tools
 
 Look up any compound by name, SMILES, or formula. Get safety data, binding affinities, crystal structures, and more.
 
@@ -200,7 +301,7 @@ Look up any compound by name, SMILES, or formula. Get safety data, binding affin
 
 </details>
 
-### ⚗️ Computational Chemistry (11 tools)
+### ⚗️ Computational Chemistry — 11 tools
 
 AI-powered retrosynthesis, forward reaction prediction, pKa, solubility, ADMET, and NMR shift prediction.
 
@@ -225,7 +326,7 @@ AI-powered retrosynthesis, forward reaction prediction, pKa, solubility, ADMET, 
 
 </details>
 
-### 🧬 Peptide Chemistry (10 tools)
+### 🧬 Peptide Chemistry — 10 tools
 
 Sequence-to-SMILES conversion with 450+ amino acids, cyclization, library generation, pI calculation, and MS/MS interpretation.
 
@@ -245,16 +346,14 @@ Sequence-to-SMILES conversion with 450+ amino acids, cyclization, library genera
 | `get_peptide_ion_series` | pep-calc.com | b/y/a/c/z ion ladders for MS/MS |
 | `assign_peptide_ms_peaks` | pep-calc.com | Match m/z values to fragments |
 
-*pep-calc.com tools fall back to local alternatives if the API is unavailable.*
-
 </details>
 
-### 🧪 Bench Chemistry — Calculators (5 tools)
+### 🧪 Bench Chemistry — 18 tools
 
-The calculators every lab needs, built in. Handles unit conversions automatically.
+**5 calculators** for everyday lab math, plus **13 reference tools** covering 202 named reactions, a reaction development checklist, protecting groups, solvents, cooling baths, TLC stains, column guides, buffers, NMR solvents, lab tips, and safety cards.
 
 <details>
-<summary>Show all 5 tools</summary>
+<summary>Show all 5 calculators</summary>
 
 | Tool | What it does |
 |:-----|:-------------|
@@ -266,29 +365,28 @@ The calculators every lab needs, built in. Handles unit conversions automaticall
 
 </details>
 
-### 📖 Bench Chemistry — Reference (10 tools)
-
-151 named reactions. 30 protecting groups. Solvent tables. Cooling baths. TLC stains. Column guides. Buffers. NMR solvents. Everything you'd normally look up in a textbook or a dog-eared printout taped to the fume hood.
-
 <details>
-<summary>Show all 10 tools</summary>
+<summary>Show all 13 reference tools</summary>
 
 | Tool | Coverage |
 |:-----|:---------|
-| `lookup_named_reaction` | **151 named reactions** with conditions, mechanism, scope, limitations |
-| `lookup_protecting_group` | **30 PGs** for OH, NH, C=O, COOH with stability/lability matrix |
+| `lookup_named_reaction` | **202 named reactions** — conditions, mechanism, scope, limitations |
+| `lookup_rxn_dev_checklist` | **30 questions** · 126 checks · 115 tips — [Kerr *et al.*, *Chem. Soc. Rev.* 2025](https://doi.org/10.1039/D4CS01046A) |
+| `lookup_protecting_group` | **30 PGs** for OH, NH, C=O, COOH with stability / lability matrix |
 | `lookup_workup_procedure` | Step-by-step protocols: LAH quench, aqueous extraction, etc. |
-| `lookup_solvent_properties` | **32 solvents**: bp, mp, density, polarity index, dielectric, miscibility |
+| `lookup_solvent_properties` | **32 solvents** — bp, density, polarity index, dielectric, miscibility |
 | `lookup_cooling_bath` | **24 recipes** from −196 °C (lN₂) to +100 °C |
 | `lookup_tlc_stain` | **13 stains** organized by functional group selectivity |
 | `lookup_column_chromatography` | Solvent selection, Rf rules, loading, troubleshooting |
-| `lookup_buffer_recipe` | **20+ buffers**: PBS, Tris, HEPES, TAE, TBE, RIPA, citrate, etc. |
-| `lookup_amino_acid_properties` | **20 canonical AAs**: MW, pKa₁/pKa₂/pKaR, pI, hydropathy |
-| `lookup_nmr_solvent` | **12 solvents**: residual ¹H/¹³C shifts, water peak, multiplicity |
+| `lookup_buffer_recipe` | **20+ buffers** — PBS, Tris, HEPES, TAE, TBE, RIPA, citrate… |
+| `lookup_amino_acid_properties` | **20 canonical AAs** — MW, pKa, pI, hydropathy |
+| `lookup_nmr_solvent` | **12 solvents** — residual ¹H/¹³C shifts, water peak, multiplicity |
+| `lookup_lab_tips` | **35 practical tips** across 9 categories |
+| `lookup_safety_card` | **9 safety cards** for hazardous reagents (*n*-BuLi, NaH, LAH…) |
 
 </details>
 
-### 🔧 Chemistry Utilities (5 tools)
+### 🔧 Chemistry Utilities — 5 tools
 
 <details>
 <summary>Show all 5 tools</summary>
@@ -303,7 +401,7 @@ The calculators every lab needs, built in. Handles unit conversions automaticall
 
 </details>
 
-### ✍️ Writing & Publication (10 tools)
+### ✍️ Writing & Publication — 10 tools
 
 Format citations, build bibliographies, generate experimental section templates, check journal requirements, and prepare your SI — all from within Claude.
 
@@ -358,6 +456,19 @@ You:    "What's a good workup for this?"
 Claude: [aqueous workup protocol, extraction with EtOAc, Na₂SO₄ dry]
 ```
 
+### Reaction development
+
+```
+You:    "I have a new C–H activation reaction. What should I check for mechanism?"
+Claude: [rxn dev checklist → KIE, radical clocks, Hammett, Stern-Volmer, CV, DFT]
+
+You:    "Walk me through the optimisation section"
+Claude: [DoE approach, one-variable-at-a-time pitfalls, PMI/E-factor, sustainability]
+
+You:    "What about proving catalysis vs stoichiometric?"
+Claude: [mercury drop test, hot filtration, TON benchmarks, NLE analysis]
+```
+
 ### Writing a paper
 
 ```
@@ -390,34 +501,74 @@ Claude: [5000-word Communication, 150-word abstract, endnote citations, graphica
 | `WOS_API_KEY` | [Web of Science](https://developer.clarivate.com) | 🏛️ | Web of Science search (institutional) |
 | `COMPTOX_API_KEY` | [EPA CompTox](mailto:ccte_api@epa.gov) | ✅ | Toxicity & environmental data |
 
-**Aliases:** `S2_API_KEY` and `SEMANTIC_SCHOLAR_API_KEY` both work, as do `MP_API_KEY`/`MATERIALS_PROJECT_API_KEY` and `RXN_API_KEY`/`RXN4CHEMISTRY_API_KEY`.
+**Aliases:** `S2_API_KEY` / `SEMANTIC_SCHOLAR_API_KEY`, `MP_API_KEY` / `MATERIALS_PROJECT_API_KEY`, `RXN_API_KEY` / `RXN4CHEMISTRY_API_KEY` all work.
+
+```json
+{
+  "mcpServers": {
+    "labmate": {
+      "command": "labmate-mcp",
+      "env": {
+        "RXN_API_KEY": "your-rxn-key",
+        "ROWAN_API_KEY": "your-rowan-key",
+        "UNPAYWALL_EMAIL": "you@university.edu"
+      }
+    }
+  }
+}
+```
 
 ---
 
 ## 🗄️ Built-in Databases
 
-These ship with labmate and require no API calls:
+Everything below ships with labmate — no API calls, no internet required.
 
-| Database | Entries | What's inside |
-|:---------|--------:|:--------------|
-| Named reactions | **151** | Conditions, mechanism type, scope, limitations, references |
-| Protecting groups | **30** | OH/NH/C=O/COOH, install/remove conditions, stability matrix |
-| Solvents | **32** | bp, density, polarity index, dielectric, miscibility, safety |
-| Cooling baths | **24** | Recipes from −196 °C to +100 °C |
-| TLC stains | **13** | Selectivity by functional group, recipe, visualization |
-| Buffer recipes | **20+** | Preparation at specific pH, temperature correction |
-| Amino acids | **20** | pKa, pI, MW, hydropathy, codon, special notes |
-| NMR solvents | **12** | Residual ¹H, ¹³C, water peak, multiplicity, bp |
-| Experimental templates | **18** | Fill-in-the-blank for common reaction types |
-| Journal guides | **12** | JACS, Angew, Nature Chem, JOC, Org Lett, etc. |
-| Abbreviations | **193** | Standard abbreviations across 7 categories |
-| SI requirements | **18** | Per-technique formatting and common mistakes |
-| Thesis writing | **6** | Section-by-section guidance and tips |
+<div align="center">
+
+| | Database | Entries | What's inside |
+|:--|:---------|-------:|:--------------|
+| ⚗️ | Named reactions | **202** | Conditions, mechanism type, scope, limitations |
+| 📋 | Rxn dev checklist | **30** questions | 126 checks + 115 tips across 7 sections |
+| 🛡️ | Protecting groups | **30** | OH / NH / C=O / COOH, stability matrix |
+| 🧴 | Solvents | **32** | bp, density, polarity index, dielectric, miscibility |
+| ❄️ | Cooling baths | **24** | Recipes from −196 °C to +100 °C |
+| 🎨 | TLC stains | **13** | Selectivity by functional group, recipe, procedure |
+| 🧫 | Buffer recipes | **20+** | Preparation at specific pH, temperature correction |
+| 🧬 | Amino acids | **20** | pKa, pI, MW, hydropathy, special notes |
+| 📻 | NMR solvents | **12** | Residual ¹H, ¹³C, water peak, multiplicity |
+| 📝 | Experimental templates | **18** | Fill-in-the-blank for common reaction types |
+| 📰 | Journal guides | **12** | JACS, Angew, Nature Chem, JOC, Org Lett… |
+| 🔤 | Abbreviations | **193** | Standard abbreviations across 7 categories |
+| 💡 | Lab tips | **35** | Practical tips in 9 categories |
+| ☣️ | Safety cards | **9** | Hazardous reagent protocols |
+| 📄 | SI requirements | **18** | Per-technique formatting and common mistakes |
+| 🎓 | Thesis writing | **6** | Section-by-section guidance |
+
+</div>
 
 <details>
-<summary><b>All 151 named reactions</b> (click to expand)</summary>
+<summary><b>All 202 named reactions</b></summary>
 
-Aldol · Appel · Arndt-Eistert · Baeyer-Villiger · Bamford-Stevens · Barton Decarboxylation · Barton-McCombie · Baylis-Hillman · Beckmann · Biginelli · Birch · Bischler-Napieralski · Bouveault-Blanc · Buchner · Buchwald-Hartwig (C–N) · Buchwald-Hartwig (C–O) · Cannizzaro · CBS · Chan-Lam · Chichibabin · Claisen Condensation · Claisen Rearrangement · Clemmensen · CuAAC Click · Comins · Cope Elimination · Corey-Bakshi-Shibata · Corey-Chaykovsky · Corey-Fuchs · Corey-Kim · Corey-Winter · Curtius · Dakin · Darzens · Dess-Martin · Dieckmann · Diels-Alder · Doering-LaFlamme · Enders SAMP/RAMP · Eschweiler-Clarke · Evans Aldol · Favorskii · Ferrier · Finkelstein · Fischer Esterification · Fischer Indole · Friedel-Crafts Acylation · Friedel-Crafts Alkylation · Fukuyama · Gabriel · Grignard · Grubbs Metathesis · Hantzsch Pyridine · Heck · Henry · Hiyama · Hiyama-Denmark · Hofmann · Horner · Horner-Wadsworth-Emmons · IBX · Ireland-Claisen · Jacobsen Epoxidation · Jones · Julia-Lythgoe · Knoevenagel · Kolbe · Kulinkovich · Kumada · Lawesson · Lemieux-Johnson · Ley · Liebeskind-Srogl · Lossen · Luche · Mannich · Matteson · Meerwein · Meerwein-Ponndorf-Verley · Michael · Midland · Minisci · Mitsunobu · Mukaiyama Aldol · Myers · Negishi · Noyori · Nozaki-Hiyama-Kishi · Ohira-Bestmann · Olefin Metathesis · Oppenauer · Oppolzer Sultam · Ozonolysis · Paal-Knorr · Parikh-Doering · Passerini · Paternò-Büchi · Petasis · Peterson · Pictet-Spengler · Pinner · Pinnick · Prins · Ramberg-Bäcklund · Reductive Amination · Reformatsky · Ring-Closing Metathesis · Ritter · Robinson Annulation · Roush · Rubottom · Sakurai-Hosomi · Sandmeyer · Sharpless AD · Sharpless AE · Shi Epoxidation · Shiina · Simmons-Smith · Sonogashira · Staudinger Ligation · Staudinger Reduction · Steglich · Stetter · Still-Gennari · Stille · Stork Enamine · Strecker · Suzuki · Suzuki-Miyaura · Swern · Takai · Tebbe · TEMPO · Tiffeneau-Demjanov · Trost AAA · Tsuji-Trost · Ugi · Ullmann · Upjohn · Vilsmeier-Haack · Wacker · Weinreb Amide · Wharton · Williamson · Wittig · Wittig Rearrangement · Wohl-Ziegler · Wolff · Wolff-Kishner · Yamaguchi · Zincke Aldehyde
+Alder-Ene · Aldol · Appel · Arbuzov · Arndt-Eistert · Baeyer-Villiger · Balz-Schiemann · Bamford-Stevens · Barton Decarboxylation · Barton-McCombie · Baylis-Hillman · Beckmann · Biginelli · Birch · Bischler-Napieralski · Blanc Chloromethylation · Bouveault-Blanc · Brown Hydroboration · Buchner Ring Expansion · Buchwald-Hartwig (C–N) · Buchwald-Hartwig (C–O) · Burgess Dehydration · Cadiot-Chodkiewicz · Cannizzaro · Carroll · Catellani · CBS · Chan-Lam · Chichibabin · Claisen Condensation · Claisen Rearrangement · Clemmensen · Click (CuAAC) · Comins · Cope Elimination · Cope Rearrangement · Corey-Bakshi-Shibata · Corey-Chaykovsky · Corey-Fuchs · Corey-Kim · Corey-Nicolaou · Corey-Winter · Cross-Metathesis · Curtius · Dakin · Darzens · Dess-Martin · Dieckmann · Diels-Alder · Doering-LaFlamme · Enders SAMP/RAMP · Eschenmoser-Claisen · Eschenmoser-Tanabe Fragmentation · Eschweiler-Clarke · Evans Aldol · Favorskii · Ferrier · Finkelstein · Fischer Esterification · Fischer Indole · Fleming-Tamao · Friedel-Crafts Acylation · Friedel-Crafts Alkylation · Fries · Fukuyama · Gabriel · Gewald · Glaser · Grignard · Grubbs Metathesis · Hantzsch Pyridine · Heck · Henry · Hiyama · Hiyama-Denmark · Hofmann · Horner · Horner-Wadsworth-Emmons · IBX · Ireland-Claisen · Jacobsen Epoxidation · Jones · Julia-Lythgoe · Kharasch · Knoevenagel · Knorr Pyrrole · Koenigs-Knorr · Kolbe · Kulinkovich · Kumada · Lawesson · Lemieux-Johnson · Ley · Liebeskind-Srogl · Lossen · Luche · Malaprade · Mander Methylenation · Mannich · Matteson · Meerwein Arylation · Meerwein Reduction · Meerwein-Ponndorf-Verley · Meinwald · Michael · Midland · Minisci · Mitsunobu · Modified Julia · Mukaiyama Aldol · Myers · Negishi · Noyori · Nozaki-Hiyama-Kishi · Ohira-Bestmann · Olefin Metathesis · Oppenauer · Oppolzer Sultam · Overman · Oxy-Cope · Ozonolysis · Paal-Knorr · Parikh-Doering · Passerini · Paternò-Büchi · Pauson-Khand · Petasis · Peterson · Pfitzner-Moffatt · Piancatelli · Pictet-Spengler · Pinner · Pinnick · Polonovski · Prevost · Prins · Ramberg-Bäcklund · Reductive Amination · Reformatsky · Rieche · Riley · Ring-Closing Metathesis · Ritter · Robinson Annulation · Roskamp · Roush · Rubottom · Saegusa-Ito · Sakurai-Hosomi · Sandmeyer · Schmidt · Shapiro · Sharpless AD · Sharpless AE · Shi Epoxidation · Shiina · Simmons-Smith · Skraup · Sonogashira · Staudinger Ligation · Staudinger Reduction · Steglich · Stetter · Still-Gennari · Stille · Stork Enamine · Strecker · Suzuki · Suzuki-Miyaura · Swern · Takai · Tebbe · TEMPO · Tiffeneau-Demjanov · Transfer Hydrogenation · Trost AAA · Tsuji-Trost · Ugi · Ullmann · Upjohn · Van Leusen · Vilsmeier-Haack · Wacker · Weinreb Amide · Wharton · Williamson · Wittig · Wittig Rearrangement · Wohl-Ziegler · Wolff · Wolff-Kishner · Yamaguchi · Zincke Aldehyde
+
+</details>
+
+<details>
+<summary><b>Reaction development checklist — 7 sections</b></summary>
+
+The checklist implements Kerr, Jenkinson, Sheridan & Sparr, "Reaction Development: A Student's Checklist", [*Chem. Soc. Rev.* 2025, DOI: 10.1039/D4CS01046A](https://doi.org/10.1039/D4CS01046A).
+
+| Section | Questions | Checks | Tips |
+|:--------|----------:|-------:|-----:|
+| 🔍 Take Stock | 5 | 16 | 17 |
+| 📈 Kinetics & Thermodynamics | 6 | 14 | 19 |
+| ⚙️ Mechanism | 4 | 18 | 19 |
+| 📊 Optimisation | 3 | 31 | 13 |
+| 🔄 Catalysis | 4 | 16 | 16 |
+| 🎯 Scope | 3 | 17 | 15 |
+| 🚀 Applications | 5 | 14 | 16 |
+| **Total** | **30** | **126** | **115** |
 
 </details>
 
@@ -427,15 +578,15 @@ Aldol · Appel · Arndt-Eistert · Baeyer-Villiger · Bamford-Stevens · Barton 
 
 ```
 labmate_mcp/
-├── server.py       5,116 lines   78 MCP tool definitions + response formatting
-├── bench.py        3,392 lines   Calculators + reference databases (151 reactions, 30 PGs, …)
+├── server.py       5,248 lines   81 MCP tool definitions + response formatting
+├── bench.py        4,714 lines   Calculators + reference databases
 ├── apis.py         1,744 lines   HTTP clients for 25+ scientific APIs
 ├── writing.py      1,488 lines   Citations, templates, journal guides, SI, thesis
 ├── chemistry.py      572 lines   Isotope patterns, CAS, units, periodic table, pH
 ├── peptide.py        384 lines   p2smi + pichemist + pep-calc.com integration
 └── __init__.py         4 lines   Version
                   ──────────────
-                  12,700 lines
+                  14,154 lines
 ```
 
 ---
@@ -452,10 +603,27 @@ High-impact areas: more named reactions, more experimental templates, more journ
 
 [MIT](LICENSE) — use freely in academia and industry.
 
-## 📚 Citations
+---
+
+<div align="center">
+
+## 📚 Cite
 
 If labmate-mcp contributes to your research, please cite the underlying tools:
 
-- **p2smi:** Feller, A. (2025). p2smi: Generation and analysis of drug-like peptide SMILES strings. *JOSS*, 10, 8319. [doi:10.21105/joss.08319](https://doi.org/10.21105/joss.08319)
-- **pichemist:** Trastoy, B. *et al.* (2023). pIChemiSt: Structure-based isoelectric point prediction. *J. Chem. Inf. Model.* [AstraZeneca peptide-tools](https://github.com/AstraZeneca/peptide-tools)
-- **OpenAlex:** Priem, J., Piwowar, H., & Orr, R. (2022). OpenAlex: A fully-open index of scholarly works. [arXiv:2205.01833](https://arxiv.org/abs/2205.01833)
+</div>
+
+- **Reaction development checklist** — Kerr, M. A.; Jenkinson, M. A.; Sheridan, H.; Sparr, C. *Chem. Soc. Rev.* **2025**. [doi:10.1039/D4CS01046A](https://doi.org/10.1039/D4CS01046A)
+- **p2smi** — Feller, A. *JOSS* **2025**, *10*, 8319. [doi:10.21105/joss.08319](https://doi.org/10.21105/joss.08319)
+- **pichemist** — Trastoy, B. *et al.* *J. Chem. Inf. Model.* **2023**. [AstraZeneca/peptide-tools](https://github.com/AstraZeneca/peptide-tools)
+- **OpenAlex** — Priem, J.; Piwowar, H.; Orr, R. [arXiv:2205.01833](https://arxiv.org/abs/2205.01833) (2022)
+
+<div align="center">
+
+<br>
+
+Made with 🧪 for chemists who'd rather be in the lab than Googling.
+
+<br>
+
+</div>
