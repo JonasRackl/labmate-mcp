@@ -15,7 +15,7 @@
 
 <br>
 
-**81 tools** &nbsp;·&nbsp; **25+ scientific APIs** &nbsp;·&nbsp; **202 named reactions** &nbsp;·&nbsp; **14k lines of code** &nbsp;·&nbsp; **zero config required**
+**81 tools** &nbsp;·&nbsp; **25+ scientific APIs** &nbsp;·&nbsp; **202 named reactions** &nbsp;·&nbsp; **zero config required**
 
 <br>
 
