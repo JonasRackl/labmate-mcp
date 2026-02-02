@@ -2,12 +2,9 @@
 
 <br>
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/badge/%F0%9F%A7%AA_labmate--mcp-Your_AI_Lab_Companion-0d1117?style=for-the-badge&labelColor=161b22">
-  <img alt="labmate-mcp" src="https://img.shields.io/badge/%F0%9F%A7%AA_labmate--mcp-Your_AI_Lab_Companion-f6f8fa?style=for-the-badge&labelColor=eaeef2">
-</picture>
+# 🧪 labmate-mcp
 
-### From literature search to benchwork to publication.
+**Your AI lab companion — from literature search to benchwork to publication.**
 
 <br>
 
@@ -30,7 +27,7 @@
 
 ---
 
-labmate-mcp is an [MCP server](https://modelcontextprotocol.io) that gives Claude deep access to scientific databases, computational chemistry, bench references, and writing utilities. **One install covers the entire research workflow** — from finding papers to writing them up.
+labmate-mcp is an [MCP server](https://modelcontextprotocol.io) that connects Claude to scientific databases, computational chemistry tools, bench references, and writing utilities. **One install covers the entire research workflow.**
 
 <div align="center">
 
@@ -38,83 +35,18 @@ labmate-mcp is an [MCP server](https://modelcontextprotocol.io) that gives Claud
 
 <table>
 <tr>
-<td align="center" width="20%">
-
-**📚 Literature**<br>
-<sub>15 tools</sub>
-
-</td>
-<td align="center" width="20%">
-
-**⚗️ Synthesis**<br>
-<sub>11 tools</sub>
-
-</td>
-<td align="center" width="20%">
-
-**🧪 Bench**<br>
-<sub>30 tools</sub>
-
-</td>
-<td align="center" width="20%">
-
-**📊 Analysis**<br>
-<sub>15 tools</sub>
-
-</td>
-<td align="center" width="20%">
-
-**✍️ Publication**<br>
-<sub>10 tools</sub>
-
-</td>
+<td align="center" width="20%"><b>📚 Literature</b><br>15 tools</td>
+<td align="center" width="20%"><b>⚗️ Synthesis</b><br>11 tools</td>
+<td align="center" width="20%"><b>🧪 Bench</b><br>30 tools</td>
+<td align="center" width="20%"><b>📊 Analysis</b><br>15 tools</td>
+<td align="center" width="20%"><b>✍️ Publication</b><br>10 tools</td>
 </tr>
 <tr>
-<td align="center"><sub>
-
-Search papers<br>
-Citation graphs<br>
-Author profiles<br>
-Preprints<br>
-Open access PDFs
-
-</sub></td>
-<td align="center"><sub>
-
-Retrosynthesis<br>
-Forward prediction<br>
-Atom mapping<br>
-pKa / ADMET<br>
-NMR prediction
-
-</sub></td>
-<td align="center"><sub>
-
-Named reactions<br>
-Reagent calculator<br>
-Protecting groups<br>
-Solvent reference<br>
-Rxn dev checklist
-
-</sub></td>
-<td align="center"><sub>
-
-Isotope patterns<br>
-Mass spectra<br>
-Binding data<br>
-Crystal structures<br>
-Safety data
-
-</sub></td>
-<td align="center"><sub>
-
-Format citations<br>
-Build bibliography<br>
-Experimental templates<br>
-Journal guides<br>
-SI checklist
-
-</sub></td>
+<td align="center">Search papers<br>Citation graphs<br>Author profiles<br>Preprints<br>Open access PDFs</td>
+<td align="center">Retrosynthesis<br>Forward prediction<br>Atom mapping<br>pKa / ADMET<br>NMR prediction</td>
+<td align="center">Named reactions<br>Reagent calculator<br>Protecting groups<br>Solvent reference<br>Rxn dev checklist</td>
+<td align="center">Isotope patterns<br>Mass spectra<br>Binding data<br>Crystal structures<br>Safety data</td>
+<td align="center">Format citations<br>Build bibliography<br>Experimental templates<br>Journal guides<br>SI checklist</td>
 </tr>
 </table>
 
@@ -181,7 +113,7 @@ docker run -it labmate-mcp
 
 <br>
 
-Restart Claude. **61 of 81 tools work immediately** — no API keys needed.
+Restart Claude. **61 of 81 tools work out of the box** — no API keys needed.
 
 > [!TIP]
 > Want retrosynthesis, pKa prediction, or NMR shifts? Add [free API keys](#%EF%B8%8F-configuration) for IBM RXN and Rowan Science.
@@ -190,42 +122,42 @@ Restart Claude. **61 of 81 tools work immediately** — no API keys needed.
 
 ## 💬 What Can I Do With This?
 
-Just talk to Claude naturally. Some examples:
+Just talk to Claude naturally:
 
 <table>
 <tr><td>
 
-> **"Search for recent papers on copper-catalyzed C–H activation and show me the top 5 most cited"**
+> **"Find the most cited papers on copper-catalyzed C–H activation from the last 5 years"**
 
-Searches Crossref + OpenAlex + Semantic Scholar, ranks by citations, shows abstracts and TLDRs.
-
-</td></tr>
-<tr><td>
-
-> **"I need to do a Suzuki coupling with 150 mg of my aryl bromide (MW 261). Calculate amounts for Pd(PPh₃)₄ (5 mol%), boronic acid (1.3 eq), and K₂CO₃ (2.5 eq)"**
-
-Returns exact masses in mg, mmol values, and volume if a solution — with your substrate as limiting reagent.
+Searches across multiple databases, ranks by citations, and gives you abstracts and AI-generated summaries.
 
 </td></tr>
 <tr><td>
 
-> **"I'm optimising a new reaction. Walk me through the reaction development checklist"**
+> **"Suzuki coupling, 150 mg aryl bromide (MW 261), 5 mol% Pd(PPh₃)₄, 1.3 eq boronic acid, 2.5 eq K₂CO₃ — how much of everything?"**
 
-30-question checklist from [*Chem. Soc. Rev.* 2025](https://doi.org/10.1039/D4CS01046A): kinetics, mechanism, DoE, catalysis, scope — with 126 actionable checks and 115 practical tips.
-
-</td></tr>
-<tr><td>
-
-> **"What's the best protecting group for a primary amine if I need it stable to acid but removable by hydrogenation?"**
-
-Searches 30 PGs with a stability matrix (acid / base / nucleophile / oxidation / reduction / H₂-Pd) and recommends Cbz.
+Calculates exact masses for each reagent with your substrate as the limiting reagent.
 
 </td></tr>
 <tr><td>
 
-> **"Format these 12 DOIs as an ACS bibliography, then give me a Buchwald–Hartwig experimental template"**
+> **"I'm developing a new reaction. What should I be thinking about?"**
 
-Crossref content negotiation → numbered reference list, plus a fill-in-the-blank template with safety notes.
+Walks you through a structured [reaction development checklist](https://doi.org/10.1039/D4CS01046A) — covering everything from initial mechanistic hypotheses to scope exploration and scale-up.
+
+</td></tr>
+<tr><td>
+
+> **"I need to protect a primary amine — stable to acid, cleavable by hydrogenation"**
+
+Compares protecting groups against a stability matrix and suggests the best match (here: Cbz).
+
+</td></tr>
+<tr><td>
+
+> **"Format these DOIs as an ACS bibliography, then give me an experimental template for a Buchwald–Hartwig"**
+
+Generates a numbered reference list and a fill-in-the-blank procedure with suggested workup and safety notes.
 
 </td></tr>
 </table>
@@ -237,12 +169,12 @@ Crossref content negotiation → numbered reference list, plus a fill-in-the-bla
 
 | Ask Claude… | What happens |
 |:---|:---|
-| "Look up the NMR solvent peaks for DMSO-d₆" | Residual ¹H: 2.50 ppm (quintet), ¹³C: 39.52 ppm, water: 3.33 ppm |
-| "Generate 20 cyclic pentapeptides with D-amino acids" | SMILES strings + MW, logP, TPSA for each |
-| "I'm submitting to JACS — what are the requirements?" | 5000-word limit, superscript numerals, 300-word abstract, graphical abstract specs |
-| "Predict the retrosynthesis of ibuprofen" | Multi-step route from commercial starting materials |
-| "What's the pKa of 4-nitrophenol?" | Quantum-chemistry prediction via Rowan Science |
-| "Give me a cooling bath recipe for −42 °C" | MeCN / dry ice, or chlorobenzene / dry ice |
+| "What are the NMR solvent peaks for DMSO-d₆?" | Residual ¹H: 2.50 ppm (quintet), ¹³C: 39.52 ppm, water: 3.33 ppm |
+| "Generate 20 cyclic pentapeptides with some D-amino acids" | Returns SMILES with MW, logP, and TPSA for each |
+| "I want to submit to JACS — what do I need to know?" | Word limits, abstract length, citation format, graphical abstract specs |
+| "Retrosynthesis of ibuprofen" | Multi-step route back to commercial starting materials |
+| "pKa of 4-nitrophenol?" | Quantum-chemistry prediction via Rowan Science |
+| "Cooling bath for −42 °C?" | MeCN / dry ice, or chlorobenzene / dry ice |
 
 </details>
 
@@ -350,7 +282,7 @@ Sequence-to-SMILES conversion with 450+ amino acids, cyclization, library genera
 
 ### 🧪 Bench Chemistry — 18 tools
 
-**5 calculators** for everyday lab math, plus **13 reference tools** covering 202 named reactions, a reaction development checklist, protecting groups, solvents, cooling baths, TLC stains, column guides, buffers, NMR solvents, lab tips, and safety cards.
+Everyday lab calculators and a reference library covering named reactions, protecting groups, solvents, workup protocols, and more.
 
 <details>
 <summary>Show all 5 calculators</summary>
@@ -371,7 +303,7 @@ Sequence-to-SMILES conversion with 450+ amino acids, cyclization, library genera
 | Tool | Coverage |
 |:-----|:---------|
 | `lookup_named_reaction` | **202 named reactions** — conditions, mechanism, scope, limitations |
-| `lookup_rxn_dev_checklist` | **30 questions** · 126 checks · 115 tips — [Kerr *et al.*, *Chem. Soc. Rev.* 2025](https://doi.org/10.1039/D4CS01046A) |
+| `lookup_rxn_dev_checklist` | Structured checklist for reaction development — [Kerr *et al.*, *Chem. Soc. Rev.* 2025](https://doi.org/10.1039/D4CS01046A) |
 | `lookup_protecting_group` | **30 PGs** for OH, NH, C=O, COOH with stability / lability matrix |
 | `lookup_workup_procedure` | Step-by-step protocols: LAH quench, aqueous extraction, etc. |
 | `lookup_solvent_properties` | **32 solvents** — bp, density, polarity index, dielectric, miscibility |
@@ -430,59 +362,59 @@ Format citations, build bibliographies, generate experimental section templates,
 ### Literature workflow
 
 ```
-You:    "Find the 5 most cited papers on photoredox catalysis from 2020-2024"
-Claude: [searches Crossref + Semantic Scholar, ranks by citation count]
+You:    "Find the 5 most cited papers on photoredox catalysis from 2020–2024"
+Claude: [returns papers ranked by citations with abstracts and TLDRs]
 
-You:    "Show me who cited paper #2 and what topics they focused on"
-Claude: [retrieves forward citation graph from Semantic Scholar]
+You:    "Who cited paper #2? What topics did they focus on?"
+Claude: [shows forward citation graph with context snippets]
 
-You:    "Is there an open access PDF for paper #3?"
-Claude: [checks Unpaywall → returns legal OA link]
+You:    "Is there a free PDF for paper #3?"
+Claude: [finds a legal open access link via Unpaywall]
 
-You:    "Generate BibTeX for all 5 papers"
-Claude: [fetches structured citation data from Crossref]
+You:    "Generate BibTeX for all 5"
+Claude: [outputs formatted BibTeX entries]
 ```
 
 ### Synthesis planning
 
 ```
-You:    "I want to make 4-methoxybiphenyl from 4-bromoanisole. What coupling should I use?"
-Claude: [looks up Suzuki coupling conditions, suggests Pd(PPh₃)₄/K₂CO₃/PhB(OH)₂]
+You:    "I want to make 4-methoxybiphenyl from 4-bromoanisole"
+Claude: [suggests Suzuki coupling, gives conditions and literature precedent]
 
-You:    "Calculate amounts for 200 mg scale with 5 mol% catalyst"
-Claude: [reaction mass calculator → exact mg for each reagent]
+You:    "Calculate amounts for a 200 mg scale, 5 mol% catalyst"
+Claude: [returns exact mg for every reagent and solvent volume]
 
-You:    "What's a good workup for this?"
-Claude: [aqueous workup protocol, extraction with EtOAc, Na₂SO₄ dry]
+You:    "What's a good workup?"
+Claude: [aqueous workup protocol with solvent, drying agent, and column conditions]
 ```
 
 ### Reaction development
 
 ```
-You:    "I have a new C–H activation reaction. What should I check for mechanism?"
-Claude: [rxn dev checklist → KIE, radical clocks, Hammett, Stern-Volmer, CV, DFT]
+You:    "I have a new C–H activation — how do I figure out the mechanism?"
+Claude: [suggests KIE, radical clocks, Hammett, Stern–Volmer, and computational approaches]
 
-You:    "Walk me through the optimisation section"
-Claude: [DoE approach, one-variable-at-a-time pitfalls, PMI/E-factor, sustainability]
+You:    "Walk me through optimisation"
+Claude: [covers DoE vs one-variable-at-a-time, green metrics, solvent screening]
 
-You:    "What about proving catalysis vs stoichiometric?"
-Claude: [mercury drop test, hot filtration, TON benchmarks, NLE analysis]
+You:    "How do I prove this is catalytic, not stoichiometric?"
+Claude: [mercury drop test, hot filtration, TON benchmarks, nonlinear effects]
 ```
 
 ### Writing a paper
 
 ```
 You:    "Format these 12 DOIs as an ACS bibliography"
-Claude: [Crossref content negotiation → numbered reference list]
+Claude: [numbered reference list in ACS style]
 
-You:    "I'm writing the experimental section for a Sonogashira coupling. Give me a template"
-Claude: [fill-in template with safety notes]
+You:    "Give me an experimental template for a Sonogashira"
+Claude: [fill-in-the-blank procedure with safety notes]
 
 You:    "What SI do I need for a small molecule paper?"
-Claude: [checklist: ¹H NMR, ¹³C NMR, HRMS, mp, HPLC purity, + formatting tips]
+Claude: [checklist with ¹H/¹³C NMR, HRMS, mp, HPLC, formatting tips]
 
-You:    "I want to submit to Angew. Chem. — what are the requirements?"
-Claude: [5000-word Communication, 150-word abstract, endnote citations, graphical abstract]
+You:    "I'm submitting to Angew — what are the requirements?"
+Claude: [word limits, abstract format, citation style, graphical abstract specs]
 ```
 
 ---
@@ -529,7 +461,7 @@ Everything below ships with labmate — no API calls, no internet required.
 | | Database | Entries | What's inside |
 |:--|:---------|-------:|:--------------|
 | ⚗️ | Named reactions | **202** | Conditions, mechanism type, scope, limitations |
-| 📋 | Rxn dev checklist | **30** questions | 126 checks + 115 tips across 7 sections |
+| 📋 | Rxn dev checklist | **30** questions | Kinetics, mechanism, DoE, catalysis, scope, scale-up |
 | 🛡️ | Protecting groups | **30** | OH / NH / C=O / COOH, stability matrix |
 | 🧴 | Solvents | **32** | bp, density, polarity index, dielectric, miscibility |
 | ❄️ | Cooling baths | **24** | Recipes from −196 °C to +100 °C |
@@ -557,18 +489,18 @@ Alder-Ene · Aldol · Appel · Arbuzov · Arndt-Eistert · Baeyer-Villiger · Ba
 <details>
 <summary><b>Reaction development checklist — 7 sections</b></summary>
 
-The checklist implements Kerr, Jenkinson, Sheridan & Sparr, "Reaction Development: A Student's Checklist", [*Chem. Soc. Rev.* 2025, DOI: 10.1039/D4CS01046A](https://doi.org/10.1039/D4CS01046A).
+Based on Kerr, Jenkinson, Sheridan & Sparr, "Reaction Development: A Student's Checklist", [*Chem. Soc. Rev.* 2025, DOI: 10.1039/D4CS01046A](https://doi.org/10.1039/D4CS01046A). Each section contains guiding questions, specific checks to perform, and practical tips.
 
-| Section | Questions | Checks | Tips |
-|:--------|----------:|-------:|-----:|
-| 🔍 Take Stock | 5 | 16 | 17 |
-| 📈 Kinetics & Thermodynamics | 6 | 14 | 19 |
-| ⚙️ Mechanism | 4 | 18 | 19 |
-| 📊 Optimisation | 3 | 31 | 13 |
-| 🔄 Catalysis | 4 | 16 | 16 |
-| 🎯 Scope | 3 | 17 | 15 |
-| 🚀 Applications | 5 | 14 | 16 |
-| **Total** | **30** | **126** | **115** |
+| Section | Questions |
+|:--------|----------:|
+| 🔍 Take Stock | 5 |
+| 📈 Kinetics & Thermodynamics | 6 |
+| ⚙️ Mechanism | 4 |
+| 📊 Optimisation | 3 |
+| 🔄 Catalysis | 4 |
+| 🎯 Scope | 3 |
+| 🚀 Applications | 5 |
+| **Total** | **30** |
 
 </details>
 
@@ -609,7 +541,7 @@ High-impact areas: more named reactions, more experimental templates, more journ
 
 ## 📚 Cite
 
-If labmate-mcp contributes to your research, please cite the underlying tools:
+If labmate-mcp is useful in your research, please cite the tools it builds on:
 
 </div>
 
