@@ -4,34 +4,68 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "labmate-mcp"
-version = "4.0.0"
-description = "Your AI lab companion — 28 MCP tools across 19 APIs for scientific research"
+version = "7.0.0"
+description = "Your AI lab companion — 78 MCP tools from literature search to benchwork to publication"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
+authors = [
+    {name = "Jonas Rackl"},
+]
 keywords = [
-    "mcp", "chemistry", "research", "literature", "pubchem", "crossref",
-    "semantic-scholar", "openalex", "crystal-structures", "bibtex",
-    "retrosynthesis", "mass-spectrometry", "materials-project",
-    "protein-structures", "pdb", "nist", "thermochemistry",
-    "claude", "anthropic", "ai-assistant",
+    # Core
+    "mcp", "model-context-protocol", "claude", "anthropic", "ai-assistant",
+    "chemistry", "research", "scientific-tools",
+    # Literature
+    "literature-search", "crossref", "openalex", "semantic-scholar",
+    "bibtex", "citation", "bibliography",
+    # Compound data
+    "pubchem", "cas", "nist", "thermochemistry", "mass-spectrometry",
+    "crystal-structures", "materials-project", "protein-structures", "pdb",
+    # Computational
+    "retrosynthesis", "rxn4chemistry", "pka", "admet", "solubility",
+    "nmr-prediction", "computational-chemistry", "rowan",
+    # Peptide
+    "peptide", "peptide-design", "isoelectric-point", "spps",
+    # Bench
+    "named-reactions", "protecting-groups", "molarity", "dilution",
+    "tlc", "chromatography", "bench-chemistry", "workup",
+    "isotope-pattern", "cas-validation", "unit-conversion",
+    "buffer-recipes", "amino-acids", "nmr-solvents", "periodic-table",
+    # Writing
+    "citation-formatting", "journal-guides", "thesis-writing",
+    "experimental-templates", "supporting-information",
+    "iupac-nomenclature", "molecular-formula",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Scientific/Engineering :: Chemistry",
     "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Scientific/Engineering :: Information Analysis",
 ]
 dependencies = [
     "mcp[cli]>=1.0.0",
     "httpx>=0.27.0",
+    "pydantic>=2.0.0",
+    "p2smi>=1.1.0",
+    "pichemist>=2.1.0",
 ]
+
+[project.optional-dependencies]
+rowan = ["rowan-python>=2.0.0"]
 
 [project.urls]
 Homepage = "https://github.com/JonasRackl/labmate-mcp"
+Repository = "https://github.com/JonasRackl/labmate-mcp"
 Issues = "https://github.com/JonasRackl/labmate-mcp/issues"
+Changelog = "https://github.com/JonasRackl/labmate-mcp/blob/main/CHANGELOG.md"
 
 [project.scripts]
 labmate-mcp = "labmate_mcp.server:main"

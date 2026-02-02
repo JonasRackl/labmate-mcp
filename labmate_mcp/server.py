@@ -1,16 +1,14 @@
 """
-scholarly-mcp: Multi-source academic research MCP server.
+labmate-mcp v7.0.0 — 78 tools from literature search to benchwork to publication.
 
-Provides Claude with access to:
-  - Literature search & paper metadata (Crossref, OpenAlex, Semantic Scholar)
-  - Citation graphs & influence analysis (Semantic Scholar)
-  - Paper recommendations (Semantic Scholar)
-  - Author profiles & bibliometrics (OpenAlex, Semantic Scholar)
-  - Research topic trend analysis (OpenAlex)
-  - Open access PDF discovery (Unpaywall)
-  - ChemRxiv preprint search (Crossref + OpenAlex)
-  - Chemical compound lookup (PubChem, Common Chemistry/CAS)
-  - Web of Science search (optional, credential-gated)
+Literature & Discovery (15): Crossref, OpenAlex, Semantic Scholar, Unpaywall, ChemRxiv, PDB
+Compound Data & Safety (12): PubChem, UniChem, COD, NIST, MassBank, BindingDB, CompTox, GHS
+Computational Chemistry (11): IBM RXN (retrosynthesis, prediction), Rowan (pKa, ADMET, NMR)
+Peptide Chemistry (10): p2smi (450 AAs, cyclization), pichemist (pI), pep-calc.com (MS)
+Bench Calculators (5): molarity, dilution, reaction mass, yield, concentration
+Bench Reference (10): 151 named reactions, 30 protecting groups, solvents, TLC, column, buffers
+Chemistry Utilities (5): isotope patterns, CAS validation, unit conversion, periodic table, pH
+Writing & Publication (10): citations, bibliography, IUPAC, experimental templates, journal guides, SI
 """
 
 from __future__ import annotations
@@ -21,6 +19,66 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 from mcp.server.fastmcp import FastMCP
+
+from labmate_mcp.bench import (
+    # Calculators
+    calc_molarity,
+    calc_dilution,
+    calc_reaction_mass,
+    calc_yield,
+    calc_concentration,
+    parse_formula,
+    # Reference lookups
+    lookup_reaction,
+    lookup_pg,
+    lookup_workup,
+    lookup_solvent,
+    lookup_cooling_bath,
+    lookup_tlc_stain,
+    lookup_column_guide,
+    CHROM_SOLVENT_SYSTEMS,
+    PROTECTING_GROUPS,
+    # v6.1 additions
+    lookup_buffer as _lookup_buffer,
+    lookup_amino_acid as _lookup_amino_acid,
+    lookup_nmr_solvent as _lookup_nmr_solvent,
+    AMINO_ACIDS,
+)
+from labmate_mcp.chemistry import (
+    validate_cas as _validate_cas,
+    calculate_isotope_pattern as _calc_isotope_pattern,
+    convert_units as _convert_units,
+    calculate_buffer_ph as _calc_buffer_ph,
+    lookup_element as _lookup_element,
+    BUFFER_PKA,
+    ELEMENTS,
+)
+from labmate_mcp.peptide import (
+    sequence_to_smiles,
+    get_cyclization_options,
+    generate_peptides,
+    get_peptide_properties,
+    check_synthesis_feasibility,
+    modify_peptide_smiles,
+    calculate_pi_from_sequence,
+    calculate_pi_from_smiles,
+    pep_calc_properties,
+    pep_calc_ms_assign,
+    pep_calc_ion_series,
+)
+from labmate_mcp.writing import (
+    format_citation as _format_citation,
+    build_bibliography as _build_bibliography,
+    iupac_from_smiles as _iupac_from_smiles,
+    smiles_from_name as _smiles_from_name,
+    format_molecular_formula as _format_molecular_formula,
+    lookup_experimental_template as _lookup_experimental_template,
+    lookup_journal_guide as _lookup_journal_guide,
+    get_si_checklist as _get_si_checklist,
+    lookup_abbreviation as _lookup_abbreviation,
+    get_thesis_guide as _get_thesis_guide,
+    get_abbreviations as _get_abbreviations,
+)
 
 from labmate_mcp.apis import (
     # Crossref
@@ -72,6 +130,17 @@ from labmate_mcp.apis import (
     rxn_available,
     rxn_predict_reaction,
     rxn_retrosynthesis,
+    rxn_paragraph_to_actions,
+    rxn_predict_atom_mapping,
+    rxn_synthesis_plan,
+    # Rowan Science
+    rowan_available,
+    rowan_predict_pka,
+    rowan_predict_solubility,
+    rowan_predict_admet,
+    rowan_search_tautomers,
+    rowan_compute_descriptors,
+    rowan_predict_nmr,
     # UniChem
     unichem_lookup,
     # COD
@@ -2904,6 +2973,2132 @@ async def get_journal_metrics(params: GetJournalInput) -> str:
 
         lines.append("")
 
+    return "\n".join(lines)
+
+
+# =============================================================================
+# Tool 29: predict_product — IBM RXN forward reaction prediction
+# =============================================================================
+
+
+class PredictProductInput(BaseModel):
+    """Forward reaction prediction — predict products from reactants."""
+    reactants_smiles: str = Field(
+        description=(
+            "Reactants as SMILES. Use '.' to separate multiple reactants, "
+            "'>>' to separate reactants from empty product side. "
+            "Example: 'CC(=O)O.OCC>>' (acetic acid + ethanol → ?)"
+        )
+    )
+
+
+@mcp.tool()
+async def predict_product(params: PredictProductInput) -> str:
+    """Predict reaction product(s) from reactants using IBM RXN AI.
+    The complement to retrosynthesis — give it starting materials and it predicts what you'll get.
+
+    REQUIRES: RXN_API_KEY environment variable.
+    """
+    if not rxn_available():
+        return (
+            "⚠️ IBM RXN API key not configured.\n\n"
+            "To enable: set RXN_API_KEY environment variable.\n"
+            "Get a key at https://rxn.res.ibm.com (Individual/Team plan)."
+        )
+
+    smiles = params.reactants_smiles
+    if ">>" not in smiles:
+        smiles = smiles + ">>"
+
+    lines = ["## Forward Reaction Prediction"]
+    lines.append(f"**Reactants:** `{smiles}`")
+    lines.append("\n*Running IBM RXN forward prediction...*\n")
+
+    data = await rxn_predict_reaction(smiles)
+
+    if not data:
+        return lines[0] + "\n\n⚠️ Prediction timed out or failed."
+
+    payload = data.get("payload", {})
+    status = payload.get("status", data.get("status", "unknown"))
+
+    if status not in ("SUCCESS", "success"):
+        return lines[0] + f"\n\n⚠️ Prediction status: {status}"
+
+    # Parse predictions
+    attempts = payload.get("attempts", [])
+    if not attempts:
+        # Try alternative response structures
+        result = payload.get("result", payload)
+        if isinstance(result, dict):
+            attempts = result.get("attempts", [])
+
+    if not attempts:
+        lines.append("No product predictions returned.")
+        return "\n".join(lines)
+
+    lines.append("### Predicted Product(s)\n")
+    for i, attempt in enumerate(attempts[:5], 1):
+        if isinstance(attempt, dict):
+            smiles_out = attempt.get("smiles", attempt.get("productMolecule", {}).get("smiles", ""))
+            confidence = attempt.get("confidence", "")
+            conf_str = f" — confidence: {confidence:.2%}" if isinstance(confidence, (int, float)) else ""
+            lines.append(f"{i}. `{smiles_out}`{conf_str}")
+        elif isinstance(attempt, str):
+            lines.append(f"{i}. `{attempt}`")
+
+    return "\n".join(lines)
+
+
+# =============================================================================
+# Tool 30: text_to_procedure — IBM RXN paragraph to actions
+# =============================================================================
+
+
+class TextToProcedureInput(BaseModel):
+    """Convert experimental text to structured procedure steps."""
+    paragraph: str = Field(
+        description=(
+            "Free-text experimental procedure paragraph. Example: "
+            "'To a solution of compound A (100 mg) in THF (5 mL) was added "
+            "NaH (60 mg) at 0°C. The mixture was stirred for 2h, then quenched "
+            "with water and extracted with EtOAc.'"
+        )
+    )
+
+
+@mcp.tool()
+async def text_to_procedure(params: TextToProcedureInput) -> str:
+    """Extract machine-readable steps from experimental text using IBM RXN NLP.
+    Converts free-text experimental paragraphs into structured action sequences
+    (MAKESOLUTION, ADD, STIR, FILTER, CONCENTRATE, etc.).
+
+    Useful for: digitizing procedures from papers, standardizing experimental sections,
+    thesis writing, ensuring reproducibility.
+
+    REQUIRES: RXN_API_KEY environment variable.
+    """
+    if not rxn_available():
+        return (
+            "⚠️ IBM RXN API key not configured.\n\n"
+            "To enable: set RXN_API_KEY environment variable.\n"
+            "Get a key at https://rxn.res.ibm.com (Individual/Team plan)."
+        )
+
+    lines = ["## Text → Procedure Extraction"]
+    lines.append(f"**Input text:** {params.paragraph[:200]}{'...' if len(params.paragraph) > 200 else ''}")
+    lines.append("")
+
+    data = await rxn_paragraph_to_actions(params.paragraph)
+
+    if not data:
+        return lines[0] + "\n\n⚠️ Extraction failed or timed out."
+
+    payload = data.get("payload", data)
+    actions = payload.get("actions", payload.get("output", []))
+
+    if not actions:
+        lines.append("No structured actions could be extracted from this text.")
+        return "\n".join(lines)
+
+    lines.append(f"### Extracted Actions ({len(actions)} steps)\n")
+    for i, action in enumerate(actions, 1):
+        if isinstance(action, dict):
+            action_name = action.get("name", action.get("action", "UNKNOWN"))
+            content = action.get("content", "")
+            duration = action.get("duration", "")
+            temperature = action.get("temperature", "")
+            details = []
+            if content:
+                details.append(str(content))
+            if duration:
+                details.append(f"duration: {duration}")
+            if temperature:
+                details.append(f"temp: {temperature}")
+            detail_str = f" — {', '.join(details)}" if details else ""
+            lines.append(f"{i}. **{action_name}**{detail_str}")
+        elif isinstance(action, str):
+            lines.append(f"{i}. {action}")
+
+    return "\n".join(lines)
+
+
+# =============================================================================
+# Tool 31: predict_atom_mapping — IBM RXN atom-to-atom mapping
+# =============================================================================
+
+
+class AtomMappingInput(BaseModel):
+    """Atom-to-atom mapping for a reaction."""
+    rxn_smiles: str = Field(
+        description=(
+            "Full reaction SMILES with reactants>>products. "
+            "Example: 'CC(=O)O.OCC>>CC(=O)OCC.O' (esterification)"
+        )
+    )
+
+
+@mcp.tool()
+async def predict_atom_mapping(params: AtomMappingInput) -> str:
+    """Map atoms from reactants to products using IBM RXN AI (atom-mapping-2020 model).
+    Shows which atom in the reactants becomes which atom in the products.
+
+    Useful for: understanding reaction mechanisms, reaction database curation,
+    verifying proposed mechanisms.
+
+    REQUIRES: RXN_API_KEY environment variable.
+    """
+    if not rxn_available():
+        return (
+            "⚠️ IBM RXN API key not configured.\n\n"
+            "To enable: set RXN_API_KEY environment variable.\n"
+            "Get a key at https://rxn.res.ibm.com (Individual/Team plan)."
+        )
+
+    lines = ["## Atom-to-Atom Mapping"]
+    lines.append(f"**Reaction:** `{params.rxn_smiles}`")
+    lines.append("\n*Running atom mapping model...*\n")
+
+    data = await rxn_predict_atom_mapping(params.rxn_smiles)
+
+    if not data:
+        return lines[0] + "\n\n⚠️ Atom mapping timed out or failed."
+
+    payload = data.get("payload", {})
+    status = payload.get("status", data.get("status", "unknown"))
+
+    if status not in ("SUCCESS", "success"):
+        return lines[0] + f"\n\n⚠️ Status: {status}"
+
+    # Parse atom mapping result
+    attempts = payload.get("attempts", [])
+    if not attempts:
+        result = payload.get("result", payload)
+        if isinstance(result, dict):
+            attempts = result.get("attempts", [])
+
+    if attempts:
+        lines.append("### Mapped Reaction(s)\n")
+        for i, attempt in enumerate(attempts[:3], 1):
+            if isinstance(attempt, dict):
+                mapped = attempt.get("smiles", attempt.get("mappedSmiles", ""))
+                confidence = attempt.get("confidence", "")
+                conf_str = f" (confidence: {confidence:.2%})" if isinstance(confidence, (int, float)) else ""
+                lines.append(f"{i}. `{mapped}`{conf_str}")
+            elif isinstance(attempt, str):
+                lines.append(f"{i}. `{attempt}`")
+    else:
+        # Try to get mapping from top-level payload
+        mapped_rxn = payload.get("mappedReactionSmiles", payload.get("mapped_smiles", ""))
+        if mapped_rxn:
+            lines.append(f"### Mapped Reaction\n\n`{mapped_rxn}`")
+        else:
+            lines.append("No atom mapping returned. Check that your reaction SMILES is valid.")
+
+    lines.append("\n*Atom map numbers in the SMILES show corresponding atoms across reactants → products.*")
+
+    return "\n".join(lines)
+
+
+# =============================================================================
+# Tool 32: plan_synthesis — IBM RXN synthesis planning (from retrosynthesis)
+# =============================================================================
+
+
+class SynthesisPlanInput(BaseModel):
+    """Generate step-by-step synthesis procedure from a retrosynthesis result."""
+    prediction_id: str = Field(
+        description=(
+            "Retrosynthesis prediction ID from a previous predict_retrosynthesis call. "
+            "Found in the retrosynthesis result payload."
+        )
+    )
+    sequence_index: int = Field(
+        default=0, ge=0,
+        description="Which retrosynthetic route to use (0 = first/best route)."
+    )
+
+
+@mcp.tool()
+async def plan_synthesis(params: SynthesisPlanInput) -> str:
+    """Turn a retrosynthetic route into a step-by-step synthesis procedure with actions.
+    Chain this after predict_retrosynthesis to get a full synthesis plan.
+
+    Workflow: predict_retrosynthesis → plan_synthesis → detailed procedure
+
+    REQUIRES: RXN_API_KEY environment variable.
+    """
+    if not rxn_available():
+        return (
+            "⚠️ IBM RXN API key not configured.\n\n"
+            "To enable: set RXN_API_KEY environment variable.\n"
+            "Get a key at https://rxn.res.ibm.com (Individual/Team plan)."
+        )
+
+    lines = ["## Synthesis Plan"]
+    lines.append(f"**Prediction ID:** `{params.prediction_id}`")
+    lines.append(f"**Route:** #{params.sequence_index + 1}")
+    lines.append("\n*Generating synthesis procedure (may take 30-90 seconds)...*\n")
+
+    data = await rxn_synthesis_plan(params.prediction_id, params.sequence_index)
+
+    if not data:
+        return lines[0] + "\n\n⚠️ Synthesis planning failed."
+
+    if data.get("error"):
+        return lines[0] + f"\n\n⚠️ {data['error']}"
+
+    lines.append(f"Using route {params.sequence_index + 1} of {data.get('total_sequences', '?')}")
+    lines.append(f"**Synthesis ID:** `{data.get('synthesis_id', 'N/A')}`\n")
+
+    # Parse procedure
+    procedure = data.get("procedure")
+    if procedure and isinstance(procedure, dict):
+        payload = procedure.get("payload", procedure)
+        steps = payload.get("steps", payload.get("actions", []))
+        if steps:
+            lines.append(f"### Procedure ({len(steps)} steps)\n")
+            for i, step in enumerate(steps, 1):
+                if isinstance(step, dict):
+                    action = step.get("name", step.get("action", "Step"))
+                    content = step.get("content", step.get("description", ""))
+                    product = step.get("product", "")
+                    lines.append(f"**Step {i}: {action}**")
+                    if content:
+                        lines.append(f"  {content}")
+                    if product:
+                        lines.append(f"  → Product: `{product}`")
+                    lines.append("")
+                elif isinstance(step, str):
+                    lines.append(f"**Step {i}:** {step}\n")
+        else:
+            lines.append("Procedure generated but no detailed steps available.")
+    else:
+        # Fall back to plan data
+        plan = data.get("plan", {})
+        if plan:
+            payload = plan.get("payload", plan)
+            lines.append("### Synthesis Plan\n")
+            tree = payload.get("sequences", payload.get("tree", []))
+            if isinstance(tree, list):
+                for item in tree:
+                    if isinstance(item, dict):
+                        rxn = item.get("smiles", item.get("rxnSmiles", ""))
+                        if rxn:
+                            lines.append(f"- `{rxn}`")
+            elif isinstance(tree, dict):
+                lines.append(f"```\n{tree}\n```")
+        else:
+            lines.append("Synthesis plan created but procedure details not available.")
+
+    return "\n".join(lines)
+
+
+# =============================================================================
+# Tool 33: predict_pka — Rowan Science pKa prediction
+# =============================================================================
+
+_ROWAN_NOT_CONFIGURED = (
+    "⚠️ Rowan Science not configured.\n\n"
+    "To enable computational chemistry tools:\n"
+    "1. `pip install rowan-python`\n"
+    "2. Set ROWAN_API_KEY environment variable\n"
+    "3. Get an API key at https://labs.rowansci.com/account/api-keys\n\n"
+    "Note: Rowan workflows use credits. Check your balance at labs.rowansci.com."
+)
+
+
+def _rowan_format_header(title: str, smiles: str, credits: float | None = None) -> list[str]:
+    """Common header for Rowan tool output."""
+    lines = [f"## {title}"]
+    lines.append(f"**Molecule:** `{smiles}`")
+    lines.append(f"**Engine:** Rowan Science (cloud quantum chemistry)")
+    if credits is not None:
+        lines.append(f"**Credits used:** {credits:.2f}")
+    return lines
+
+
+class PredictPkaInput(BaseModel):
+    """Predict acid/base dissociation constants."""
+    smiles: str = Field(
+        description="SMILES of the molecule (e.g., 'c1ccccc1O' for phenol)."
+    )
+    pka_range: Optional[str] = Field(
+        default="2,12",
+        description="pKa range to search as 'min,max' (default: '2,12')."
+    )
+
+
+@mcp.tool()
+async def predict_pka(params: PredictPkaInput) -> str:
+    """Predict pKa values using Rowan Science quantum chemistry.
+    Computes acid and base dissociation constants for any molecule from SMILES.
+
+    Uses AIMNet2 neural network potential with careful mode for accuracy.
+
+    REQUIRES: rowan-python package + ROWAN_API_KEY (uses credits).
+    """
+    if not rowan_available():
+        return _ROWAN_NOT_CONFIGURED
+
+    # Parse pKa range
+    try:
+        parts = params.pka_range.split(",")
+        pka_min, pka_max = int(parts[0].strip()), int(parts[1].strip())
+    except Exception:
+        pka_min, pka_max = 2, 12
+
+    lines = _rowan_format_header("pKa Prediction", params.smiles)
+    lines.append(f"**Range:** {pka_min}–{pka_max}")
+    lines.append("\n*Computing pKa values (typically 10-60 seconds)...*\n")
+
+    data = await rowan_predict_pka(params.smiles, pka_range=(pka_min, pka_max))
+
+    if not data:
+        return lines[0] + "\n\n⚠️ pKa computation failed."
+    if data.get("error"):
+        return lines[0] + f"\n\n⚠️ {data['error']}"
+
+    lines[2] = f"**Engine:** Rowan Science — credits used: {data.get('credits_charged', '?')}"
+
+    result = data.get("data", {})
+    if not result:
+        lines.append("Computation completed but no pKa data returned.")
+        return "\n".join(lines)
+
+    # Format pKa results
+    lines.append("### Results\n")
+
+    strongest_acid = result.get("strongest_acid")
+    strongest_base = result.get("strongest_base")
+    if strongest_acid is not None:
+        lines.append(f"**Strongest acid pKa:** {strongest_acid:.2f}")
+    if strongest_base is not None:
+        lines.append(f"**Strongest base pKa:** {strongest_base:.2f}")
+
+    # Individual sites
+    sites = result.get("pka_sites", result.get("sites", result.get("results", [])))
+    if isinstance(sites, list) and sites:
+        lines.append(f"\n### Individual Sites ({len(sites)})\n")
+        for site in sites:
+            if isinstance(site, dict):
+                pka = site.get("pka", site.get("value", ""))
+                atom = site.get("atom_index", site.get("atom", ""))
+                stype = site.get("type", site.get("site_type", ""))
+                pka_str = f"{pka:.2f}" if isinstance(pka, (int, float)) else str(pka)
+                lines.append(f"- pKa = {pka_str} (atom {atom}, {stype})")
+
+    # Also try to get any other useful data
+    for key in ["microstate_pkas", "protonation_states", "charge_states"]:
+        if key in result and result[key]:
+            lines.append(f"\n**{key.replace('_', ' ').title()}:** {result[key]}")
+
+    return "\n".join(lines)
+
+
+# =============================================================================
+# Tool 34: predict_solubility — Rowan Science solubility prediction
+# =============================================================================
+
+
+class PredictSolubilityInput(BaseModel):
+    """Predict aqueous or organic solvent solubility."""
+    smiles: str = Field(
+        description="SMILES of the molecule."
+    )
+    method: Optional[str] = Field(
+        default="fastsolv",
+        description="Prediction method: 'fastsolv' (default, fast ML), 'kingfisher', or 'esol'."
+    )
+    solvents: Optional[str] = Field(
+        default=None,
+        description="Comma-separated solvents (e.g., 'water,ethanol'). Defaults to water."
+    )
+
+
+@mcp.tool()
+async def predict_solubility(params: PredictSolubilityInput) -> str:
+    """Predict molecular solubility using Rowan Science.
+    Supports aqueous and organic solvents using ML models.
+
+    REQUIRES: rowan-python package + ROWAN_API_KEY (uses credits).
+    """
+    if not rowan_available():
+        return _ROWAN_NOT_CONFIGURED
+
+    solvents = [s.strip() for s in params.solvents.split(",")] if params.solvents else None
+
+    lines = _rowan_format_header("Solubility Prediction", params.smiles)
+    lines.append(f"**Method:** {params.method}")
+    if solvents:
+        lines.append(f"**Solvents:** {', '.join(solvents)}")
+    lines.append("\n*Computing solubility...*\n")
+
+    data = await rowan_predict_solubility(
+        params.smiles,
+        method=params.method,
+        solvents=solvents,
+    )
+
+    if not data:
+        return lines[0] + "\n\n⚠️ Solubility computation failed."
+    if data.get("error"):
+        return lines[0] + f"\n\n⚠️ {data['error']}"
+
+    result = data.get("data", {})
+    if not result:
+        lines.append("Computation completed but no solubility data returned.")
+        return "\n".join(lines)
+
+    lines.append("### Results\n")
+    if isinstance(result, dict):
+        for key, value in result.items():
+            if key.startswith("_"):
+                continue
+            if isinstance(value, (int, float)):
+                lines.append(f"**{key.replace('_', ' ').title()}:** {value:.4f}")
+            elif isinstance(value, list):
+                lines.append(f"**{key.replace('_', ' ').title()}:**")
+                for item in value:
+                    lines.append(f"  - {item}")
+            elif value is not None:
+                lines.append(f"**{key.replace('_', ' ').title()}:** {value}")
+
+    return "\n".join(lines)
+
+
+# =============================================================================
+# Tool 35: predict_admet — Rowan Science ADMET prediction
+# =============================================================================
+
+
+class PredictAdmetInput(BaseModel):
+    """Predict ADMET (absorption, distribution, metabolism, excretion, toxicity) properties."""
+    smiles: str = Field(
+        description="SMILES of the molecule."
+    )
+
+
+@mcp.tool()
+async def predict_admet(params: PredictAdmetInput) -> str:
+    """Predict ADMET properties using Rowan Science.
+    Computes absorption, distribution, metabolism, excretion, and toxicity predictions.
+
+    Returns drug-likeness assessments useful for medicinal chemistry and pharmacology.
+
+    REQUIRES: rowan-python package + ROWAN_API_KEY (uses credits).
+    """
+    if not rowan_available():
+        return _ROWAN_NOT_CONFIGURED
+
+    lines = _rowan_format_header("ADMET Prediction", params.smiles)
+    lines.append("\n*Computing ADMET properties...*\n")
+
+    data = await rowan_predict_admet(params.smiles)
+
+    if not data:
+        return lines[0] + "\n\n⚠️ ADMET computation failed."
+    if data.get("error"):
+        return lines[0] + f"\n\n⚠️ {data['error']}"
+
+    result = data.get("data", {})
+    if not result:
+        lines.append("Computation completed but no ADMET data returned.")
+        return "\n".join(lines)
+
+    lines.append("### ADMET Properties\n")
+
+    # Format ADMET categories
+    categories = {
+        "absorption": [], "distribution": [], "metabolism": [],
+        "excretion": [], "toxicity": [], "other": [],
+    }
+
+    for key, value in result.items():
+        if key.startswith("_"):
+            continue
+        key_lower = key.lower()
+        placed = False
+        for cat in ["absorption", "distribution", "metabolism", "excretion", "toxicity"]:
+            if cat[:4] in key_lower:
+                categories[cat].append((key, value))
+                placed = True
+                break
+        if not placed:
+            categories["other"].append((key, value))
+
+    # If no categorization worked, just list everything
+    has_categories = any(v for k, v in categories.items() if k != "other")
+    if has_categories:
+        for cat_name, props in categories.items():
+            if props:
+                lines.append(f"**{cat_name.title()}**")
+                for k, v in props:
+                    label = k.replace("_", " ").title()
+                    if isinstance(v, float):
+                        lines.append(f"  {label}: {v:.4f}")
+                    else:
+                        lines.append(f"  {label}: {v}")
+                lines.append("")
+    else:
+        for key, value in result.items():
+            if key.startswith("_"):
+                continue
+            label = key.replace("_", " ").title()
+            if isinstance(value, float):
+                lines.append(f"- **{label}:** {value:.4f}")
+            elif isinstance(value, dict):
+                lines.append(f"- **{label}:**")
+                for k2, v2 in value.items():
+                    lines.append(f"    {k2}: {v2}")
+            else:
+                lines.append(f"- **{label}:** {value}")
+
+    return "\n".join(lines)
+
+
+# =============================================================================
+# Tool 36: search_tautomers — Rowan Science tautomer enumeration
+# =============================================================================
+
+
+class SearchTautomersInput(BaseModel):
+    """Enumerate and rank tautomers of a molecule."""
+    smiles: str = Field(
+        description="SMILES of the molecule (e.g., 'C1=CC(=O)NC=C1' for 2-pyridinone)."
+    )
+
+
+@mcp.tool()
+async def search_tautomers(params: SearchTautomersInput) -> str:
+    """Enumerate and rank tautomers using Rowan Science.
+    Uses quantum chemistry to identify all relevant tautomeric forms and rank them by energy.
+
+    REQUIRES: rowan-python package + ROWAN_API_KEY (uses credits).
+    """
+    if not rowan_available():
+        return _ROWAN_NOT_CONFIGURED
+
+    lines = _rowan_format_header("Tautomer Search", params.smiles)
+    lines.append("\n*Enumerating and ranking tautomers...*\n")
+
+    data = await rowan_search_tautomers(params.smiles)
+
+    if not data:
+        return lines[0] + "\n\n⚠️ Tautomer search failed."
+    if data.get("error"):
+        return lines[0] + f"\n\n⚠️ {data['error']}"
+
+    result = data.get("data", {})
+    if not result:
+        lines.append("Computation completed but no tautomer data returned.")
+        return "\n".join(lines)
+
+    lines.append("### Tautomers\n")
+
+    tautomers = result.get("tautomers", result.get("conformers", []))
+    if isinstance(tautomers, list) and tautomers:
+        for i, taut in enumerate(tautomers, 1):
+            if isinstance(taut, dict):
+                smiles = taut.get("smiles", taut.get("canonical_smiles", ""))
+                energy = taut.get("energy", taut.get("relative_energy", ""))
+                pop = taut.get("population", taut.get("boltzmann_weight", ""))
+                lines.append(f"**Tautomer {i}:** `{smiles}`")
+                if isinstance(energy, (int, float)):
+                    lines.append(f"  Relative energy: {energy:.2f} kcal/mol")
+                if isinstance(pop, (int, float)):
+                    lines.append(f"  Population: {pop:.1%}")
+                lines.append("")
+            elif isinstance(taut, str):
+                lines.append(f"{i}. `{taut}`")
+    else:
+        # Generic data dump
+        for key, value in result.items():
+            if key.startswith("_"):
+                continue
+            label = key.replace("_", " ").title()
+            if isinstance(value, (int, float)):
+                lines.append(f"**{label}:** {value:.4f}")
+            elif isinstance(value, list) and len(value) <= 10:
+                lines.append(f"**{label}:**")
+                for item in value:
+                    lines.append(f"  - {item}")
+            elif value is not None:
+                lines.append(f"**{label}:** {value}")
+
+    return "\n".join(lines)
+
+
+# =============================================================================
+# Tool 37: compute_descriptors — Rowan Science molecular descriptors
+# =============================================================================
+
+
+class ComputeDescriptorsInput(BaseModel):
+    """Compute molecular descriptors from structure."""
+    smiles: str = Field(
+        description="SMILES of the molecule."
+    )
+
+
+@mcp.tool()
+async def compute_descriptors(params: ComputeDescriptorsInput) -> str:
+    """Compute molecular descriptors using Rowan Science.
+    Returns cheminformatics descriptors computed from the molecular structure.
+
+    REQUIRES: rowan-python package + ROWAN_API_KEY (uses credits).
+    """
+    if not rowan_available():
+        return _ROWAN_NOT_CONFIGURED
+
+    lines = _rowan_format_header("Molecular Descriptors", params.smiles)
+    lines.append("\n*Computing descriptors...*\n")
+
+    data = await rowan_compute_descriptors(params.smiles)
+
+    if not data:
+        return lines[0] + "\n\n⚠️ Descriptor computation failed."
+    if data.get("error"):
+        return lines[0] + f"\n\n⚠️ {data['error']}"
+
+    result = data.get("data", {})
+    if not result:
+        lines.append("Computation completed but no descriptor data returned.")
+        return "\n".join(lines)
+
+    lines.append("### Computed Descriptors\n")
+
+    # Try to group descriptors by category
+    for key, value in sorted(result.items()):
+        if key.startswith("_"):
+            continue
+        label = key.replace("_", " ").title()
+        if isinstance(value, float):
+            lines.append(f"- **{label}:** {value:.4f}")
+        elif isinstance(value, int):
+            lines.append(f"- **{label}:** {value}")
+        elif isinstance(value, dict):
+            lines.append(f"- **{label}:**")
+            for k2, v2 in value.items():
+                if isinstance(v2, float):
+                    lines.append(f"    {k2}: {v2:.4f}")
+                else:
+                    lines.append(f"    {k2}: {v2}")
+        elif value is not None:
+            lines.append(f"- **{label}:** {value}")
+
+    return "\n".join(lines)
+
+
+# =============================================================================
+# Tool 38: predict_nmr — Rowan Science NMR prediction
+# =============================================================================
+
+
+class PredictNmrInput(BaseModel):
+    """Predict NMR chemical shifts."""
+    smiles: str = Field(
+        description="SMILES of the molecule."
+    )
+    solvent: Optional[str] = Field(
+        default="chloroform",
+        description="NMR solvent (default: 'chloroform'). Common: 'chloroform', 'dmso', 'water', 'methanol'."
+    )
+
+
+@mcp.tool()
+async def predict_nmr(params: PredictNmrInput) -> str:
+    """Predict ¹H and ¹³C NMR chemical shifts using Rowan Science.
+    Uses conformer search + neural network potentials to predict NMR spectra.
+
+    Useful for: structure verification, spectral assignment, thesis writing.
+
+    REQUIRES: rowan-python package + ROWAN_API_KEY (uses credits).
+    """
+    if not rowan_available():
+        return _ROWAN_NOT_CONFIGURED
+
+    lines = _rowan_format_header("NMR Prediction", params.smiles)
+    lines.append(f"**Solvent:** {params.solvent}")
+    lines.append("\n*Computing NMR shifts (conformer search + prediction, may take 1-3 minutes)...*\n")
+
+    data = await rowan_predict_nmr(params.smiles, solvent=params.solvent)
+
+    if not data:
+        return lines[0] + "\n\n⚠️ NMR prediction failed."
+    if data.get("error"):
+        return lines[0] + f"\n\n⚠️ {data['error']}"
+
+    result = data.get("data", {})
+    if not result:
+        lines.append("Computation completed but no NMR data returned.")
+        return "\n".join(lines)
+
+    lines.append("### Predicted NMR Shifts\n")
+
+    # Try common result structures
+    h_shifts = result.get("h_shifts", result.get("proton_shifts", result.get("1H", [])))
+    c_shifts = result.get("c_shifts", result.get("carbon_shifts", result.get("13C", [])))
+
+    if h_shifts:
+        lines.append("**¹H Chemical Shifts (ppm)**\n")
+        if isinstance(h_shifts, list):
+            for shift in h_shifts:
+                if isinstance(shift, dict):
+                    atom = shift.get("atom_index", shift.get("atom", ""))
+                    val = shift.get("shift", shift.get("value", ""))
+                    val_str = f"{val:.2f}" if isinstance(val, (int, float)) else str(val)
+                    lines.append(f"  H{atom}: {val_str} ppm")
+                elif isinstance(shift, (int, float)):
+                    lines.append(f"  {shift:.2f} ppm")
+        lines.append("")
+
+    if c_shifts:
+        lines.append("**¹³C Chemical Shifts (ppm)**\n")
+        if isinstance(c_shifts, list):
+            for shift in c_shifts:
+                if isinstance(shift, dict):
+                    atom = shift.get("atom_index", shift.get("atom", ""))
+                    val = shift.get("shift", shift.get("value", ""))
+                    val_str = f"{val:.2f}" if isinstance(val, (int, float)) else str(val)
+                    lines.append(f"  C{atom}: {val_str} ppm")
+                elif isinstance(shift, (int, float)):
+                    lines.append(f"  {shift:.2f} ppm")
+        lines.append("")
+
+    # If the result structure is different, just dump it nicely
+    if not h_shifts and not c_shifts:
+        for key, value in result.items():
+            if key.startswith("_"):
+                continue
+            label = key.replace("_", " ").title()
+            if isinstance(value, list) and value:
+                lines.append(f"**{label}:**")
+                for item in value[:50]:
+                    if isinstance(item, dict):
+                        lines.append(f"  {item}")
+                    elif isinstance(item, (int, float)):
+                        lines.append(f"  {item:.2f}")
+                    else:
+                        lines.append(f"  {item}")
+            elif isinstance(value, (int, float)):
+                lines.append(f"**{label}:** {value:.4f}")
+            elif value is not None:
+                lines.append(f"**{label}:** {value}")
+
+    return "\n".join(lines)
+
+
+# =============================================================================
+# Bench Chemistry — Calculators (5 tools, pure computation)
+# =============================================================================
+
+
+class CalcMolarityInput(BaseModel):
+    """Calculate molarity, moles, mass, or volume — provide any 2–3 knowns, solve for unknowns."""
+    concentration_M: float | None = Field(None, description="Concentration in mol/L (M)")
+    mass_grams: float | None = Field(None, description="Mass in grams")
+    moles: float | None = Field(None, description="Amount in moles")
+    volume_ml: float | None = Field(None, description="Volume in mL")
+    volume_l: float | None = Field(None, description="Volume in L")
+    mw: float | None = Field(None, description="Molecular weight in g/mol")
+    formula: str | None = Field(None, description="Molecular formula (e.g. 'NaCl', 'Ca(OH)2') — auto-calculates MW")
+
+
+@mcp.tool()
+async def calculate_molarity(params: CalcMolarityInput) -> str:
+    """Calculate molarity/concentration. Provide 2-3 knowns (mass, moles, volume, MW, formula) → solves for unknowns. Handles M=n/V, n=m/MW, and all permutations."""
+    try:
+        result = calc_molarity(
+            concentration=params.concentration_M,
+            mass_grams=params.mass_grams,
+            moles=params.moles,
+            volume_ml=params.volume_ml,
+            volume_l=params.volume_l,
+            mw=params.mw,
+            formula=params.formula,
+        )
+        lines = ["**Molarity Calculation**"]
+        for k, v in result.items():
+            label = k.replace("_", " ").replace("per", "/")
+            lines.append(f"  {label}: {v}")
+        return "\n".join(lines)
+    except Exception as e:
+        return f"Error: {e}"
+
+
+class CalcDilutionInput(BaseModel):
+    """C₁V₁ = C₂V₂ solver. Provide 3 of 4 values → solves for the unknown."""
+    c1: float | None = Field(None, description="Initial concentration")
+    v1: float | None = Field(None, description="Initial volume")
+    c2: float | None = Field(None, description="Final concentration")
+    v2: float | None = Field(None, description="Final volume")
+    c1_unit: str = Field("M", description="Unit for c1 (M, mM, μM, nM, mg/mL, %)")
+    v1_unit: str = Field("mL", description="Unit for v1 (mL, L, μL)")
+    c2_unit: str = Field("M", description="Unit for c2")
+    v2_unit: str = Field("mL", description="Unit for v2")
+
+
+@mcp.tool()
+async def calculate_dilution(params: CalcDilutionInput) -> str:
+    """C₁V₁ = C₂V₂ dilution calculator. Provide any 3 values → solves for the 4th. Reports solvent to add."""
+    try:
+        result = calc_dilution(
+            c1=params.c1, v1=params.v1, c2=params.c2, v2=params.v2,
+            c1_unit=params.c1_unit, v1_unit=params.v1_unit,
+            c2_unit=params.c2_unit, v2_unit=params.v2_unit,
+        )
+        lines = ["**Dilution Calculation (C₁V₁ = C₂V₂)**"]
+        for k, v in result.items():
+            label = k.replace("_", " ")
+            lines.append(f"  {label}: {v}")
+        return "\n".join(lines)
+    except Exception as e:
+        return f"Error: {e}"
+
+
+class ReagentEntry(BaseModel):
+    """A single reagent in a reaction mass calculation."""
+    name: str = Field(description="Reagent name")
+    mw: float | None = Field(None, description="Molecular weight (g/mol). Or provide formula.")
+    formula: str | None = Field(None, description="Molecular formula — auto-calculates MW")
+    equiv: float = Field(1.0, description="Equivalents (1.0 = stoichiometric)")
+    mass_g: float | None = Field(None, description="Known mass in grams")
+    moles: float | None = Field(None, description="Known moles")
+    volume_ml: float | None = Field(None, description="Known volume in mL (requires density or molarity)")
+    density: float | None = Field(None, description="Density in g/mL (for neat liquids)")
+    molarity: float | None = Field(None, description="Solution concentration in M")
+    limiting: bool = Field(False, description="Is this the limiting reagent?")
+
+
+class CalcReactionMassInput(BaseModel):
+    """Calculate masses/volumes for all reagents in a reaction from equivalents."""
+    reagents: list[ReagentEntry] = Field(description="List of reagents with their properties")
+
+
+@mcp.tool()
+async def calculate_reaction_mass(params: CalcReactionMassInput) -> str:
+    """Calculate mass, moles, and volume for each reagent in a reaction. Specify one limiting reagent with known mass/moles, set equivalents for others → get required amounts for all."""
+    try:
+        reagent_dicts = [r.model_dump(exclude_none=True) for r in params.reagents]
+        result = calc_reaction_mass(reagent_dicts)
+        lines = ["**Reaction Mass Calculation**"]
+        if "limiting_reagent" in result:
+            lines.append(f"Limiting reagent: {result['limiting_reagent']}")
+            lines.append(f"Reference moles: {result.get('reference_moles', 'N/A')}")
+        lines.append("")
+        for entry in result.get("reagents", []):
+            lines.append(f"**{entry.get('name', '?')}** ({entry.get('equiv', '?')} equiv)")
+            for k in ["moles", "mass_g", "volume_ml"]:
+                if k in entry:
+                    lines.append(f"  {k.replace('_', ' ')}: {entry[k]:.4g}")
+            lines.append("")
+        return "\n".join(lines)
+    except Exception as e:
+        return f"Error: {e}"
+
+
+class CalcYieldInput(BaseModel):
+    """Calculate reaction yield."""
+    actual_mass_g: float | None = Field(None, description="Actual product mass obtained (g)")
+    actual_moles: float | None = Field(None, description="Actual product moles obtained")
+    theoretical_mass_g: float | None = Field(None, description="Theoretical product mass (g)")
+    theoretical_moles: float | None = Field(None, description="Theoretical product moles")
+    product_mw: float | None = Field(None, description="Product molecular weight (g/mol)")
+    product_formula: str | None = Field(None, description="Product formula — auto-calculates MW")
+    limiting_mass_g: float | None = Field(None, description="Limiting reagent mass (g)")
+    limiting_mw: float | None = Field(None, description="Limiting reagent MW (g/mol)")
+    limiting_formula: str | None = Field(None, description="Limiting reagent formula")
+    stoich_ratio: float = Field(1.0, description="Product:limiting reagent stoichiometric ratio")
+
+
+@mcp.tool()
+async def calculate_yield(params: CalcYieldInput) -> str:
+    """Calculate percent yield. Provide actual product amount and either theoretical amount or limiting reagent info."""
+    try:
+        result = calc_yield(
+            actual_mass_g=params.actual_mass_g,
+            actual_moles=params.actual_moles,
+            theoretical_mass_g=params.theoretical_mass_g,
+            theoretical_moles=params.theoretical_moles,
+            product_mw=params.product_mw,
+            product_formula=params.product_formula,
+            limiting_mass_g=params.limiting_mass_g,
+            limiting_mw=params.limiting_mw,
+            limiting_formula=params.limiting_formula,
+            stoich_ratio=params.stoich_ratio,
+        )
+        lines = ["**Yield Calculation**"]
+        for k, v in result.items():
+            label = k.replace("_", " ").title()
+            if isinstance(v, float):
+                lines.append(f"  {label}: {v:.4g}")
+            else:
+                lines.append(f"  {label}: {v}")
+        return "\n".join(lines)
+    except Exception as e:
+        return f"Error: {e}"
+
+
+class CalcConcentrationInput(BaseModel):
+    """Convert between concentration units."""
+    value: float = Field(description="Concentration value to convert")
+    from_unit: str = Field(description="Source unit: M, mM, μM, nM, mg/mL, g/L, μg/mL, %w/v, %w/w, %v/v, ppm, ppb")
+    to_unit: str = Field(description="Target unit (same options)")
+    mw: float | None = Field(None, description="Molecular weight (required for molar ↔ mass conversions)")
+    formula: str | None = Field(None, description="Molecular formula (auto-calculates MW)")
+    density_solution: float = Field(1.0, description="Solution density in g/mL (for %w/w conversions)")
+
+
+@mcp.tool()
+async def calculate_concentration(params: CalcConcentrationInput) -> str:
+    """Convert between concentration units (M, mM, μM, mg/mL, %w/v, ppm, ppb, etc.). MW required for molar↔mass conversions."""
+    try:
+        result = calc_concentration(
+            value=params.value,
+            from_unit=params.from_unit,
+            to_unit=params.to_unit,
+            mw=params.mw,
+            formula=params.formula,
+            density_solution=params.density_solution,
+        )
+        lines = [f"**Concentration Conversion**"]
+        lines.append(f"  {params.value} {params.from_unit} = {result['result_value']:.6g} {params.to_unit}")
+        if "intermediate_mg_per_mL" in result:
+            lines.append(f"  (intermediate: {result['intermediate_mg_per_mL']:.4g} mg/mL)")
+        return "\n".join(lines)
+    except Exception as e:
+        return f"Error: {e}"
+
+
+# =============================================================================
+# Bench Chemistry — Reference Lookups (7 tools, embedded knowledge)
+# =============================================================================
+
+
+class LookupReactionInput(BaseModel):
+    """Search named organic chemistry reactions."""
+    query: str = Field(description="Reaction name, category, substrate, or keyword (e.g. 'Suzuki', 'cross-coupling', 'aldehyde oxidation')")
+
+
+@mcp.tool()
+async def lookup_named_reaction(params: LookupReactionInput) -> str:
+    """Search 86+ named organic reactions. Returns conditions, mechanism, substrate scope, limitations, and related reactions. Covers: cross-couplings, oxidations, reductions, rearrangements, cycloadditions, FGIs, radical, heterocycle synthesis."""
+    results = lookup_reaction(params.query)
+    if not results:
+        return f"No named reactions found matching '{params.query}'. Try: Suzuki, Grignard, Wittig, Swern, Diels-Alder, aldol, etc."
+    lines = []
+    for r in results[:5]:
+        lines.append(f"## {r['name']}")
+        if r.get("aliases"):
+            lines.append(f"**Also known as:** {', '.join(r['aliases'])}")
+        lines.append(f"**Category:** {r['category']} — {r['type']}")
+        lines.append(f"**Summary:** {r['summary']}")
+        lines.append(f"**Conditions:** {r['conditions']}")
+        lines.append(f"**Substrate scope:** {r['substrate']}")
+        if r.get("limitations"):
+            lines.append(f"**Limitations:** {r['limitations']}")
+        if r.get("mechanism"):
+            lines.append(f"**Mechanism:** {r['mechanism']}")
+        if r.get("related"):
+            lines.append(f"**Related:** {r['related']}")
+        if r.get("refs"):
+            lines.append(f"**Key reference:** {r['refs']}")
+        lines.append("")
+    if len(results) > 5:
+        lines.append(f"*…and {len(results) - 5} more results*")
+    return "\n".join(lines)
+
+
+class LookupPGInput(BaseModel):
+    """Search protecting groups."""
+    query: str = Field(description="PG name or functional group (e.g. 'Boc', 'TBS', 'hydroxyl', 'amino')")
+    functional_group: str | None = Field(None, description="Filter by: hydroxyl, amino, carbonyl, carboxyl")
+
+
+@mcp.tool()
+async def lookup_protecting_group(params: LookupPGInput) -> str:
+    """Search 30 protecting groups across hydroxyl, amino, carbonyl, carboxyl. Returns protection/deprotection conditions and stability matrix (acid/base/nucleophile/oxidation/reduction/H₂-Pd). S=stable, M=moderate, L=labile."""
+    results = lookup_pg(params.query, params.functional_group)
+    if not results:
+        return f"No protecting groups found for '{params.query}'. Try: Boc, Fmoc, TBS, PMB, MOM, Bn, etc."
+    lines = []
+    for pg in results[:10]:
+        stab = pg.get("stability", {})
+        stab_str = " | ".join(f"{k}:{v}" for k, v in stab.items())
+        lines.append(f"## {pg['name']} ({pg.get('full_name', '')})")
+        lines.append(f"**Protection:** {pg['protection']}")
+        lines.append(f"**Deprotection:** {pg['deprotection']}")
+        lines.append(f"**Stability:** {stab_str}")
+        if pg.get("notes"):
+            lines.append(f"**Notes:** {pg['notes']}")
+        lines.append("")
+    return "\n".join(lines)
+
+
+class LookupWorkupInput(BaseModel):
+    """Search workup procedures."""
+    query: str = Field(description="Reaction type or workup keyword (e.g. 'LAH', 'Fieser', 'aqueous', 'extraction', 'Grignard')")
+
+
+@mcp.tool()
+async def lookup_workup_procedure(params: LookupWorkupInput) -> str:
+    """Search bench workup procedures. Returns step-by-step protocols for: standard aqueous workup, acid-base extraction, Fieser (LAH/DIBAL), NH₄Cl quench, Rochelle's salt, and more."""
+    results = lookup_workup(params.query)
+    if not results:
+        return f"No workup procedures found for '{params.query}'. Try: LAH, Fieser, extraction, aqueous, quench, Grignard."
+    lines = []
+    for w in results[:3]:
+        lines.append(f"## {w['name']}")
+        if w.get("use_when"):
+            lines.append(f"**When to use:** {w['use_when']}")
+        if w.get("steps"):
+            lines.append("**Procedure:**")
+            for i, step in enumerate(w["steps"], 1):
+                lines.append(f"  {i}. {step}")
+        if w.get("tips"):
+            lines.append("**Tips:**")
+            for tip in w["tips"]:
+                lines.append(f"  • {tip}")
+        lines.append("")
+    return "\n".join(lines)
+
+
+class LookupSolventInput(BaseModel):
+    """Search solvent properties."""
+    query: str = Field(description="Solvent name or property keyword (e.g. 'THF', 'DCM', 'polar aprotic', 'high boiling')")
+
+
+@mcp.tool()
+async def lookup_solvent_properties(params: LookupSolventInput) -> str:
+    """Search 32 common lab solvents. Returns: boiling point, density, polarity index, dielectric constant, water miscibility, common uses, and safety notes."""
+    results = lookup_solvent(params.query)
+    if not results:
+        return f"No solvents found for '{params.query}'. Try: THF, DCM, DMF, DMSO, EtOAc, hexanes, toluene, MeCN, etc."
+    lines = []
+    for s in results[:10]:
+        lines.append(f"## {s['name']}")
+        props = []
+        if s.get("bp"):
+            props.append(f"bp {s['bp']}°C")
+        if s.get("density"):
+            props.append(f"d={s['density']} g/mL")
+        if s.get("polarity_index") is not None:
+            props.append(f"polarity index={s['polarity_index']}")
+        if s.get("dielectric") is not None:
+            props.append(f"ε={s['dielectric']}")
+        lines.append(f"**Properties:** {', '.join(props)}")
+        if s.get("water_misc") is not None:
+            lines.append(f"**Water miscible:** {'Yes' if s['water_misc'] else 'No'}")
+        if s.get("uses"):
+            lines.append(f"**Common uses:** {s['uses']}")
+        if s.get("safety"):
+            lines.append(f"**Safety:** {s['safety']}")
+        lines.append("")
+    return "\n".join(lines)
+
+
+class LookupCoolingBathInput(BaseModel):
+    """Find cooling bath recipe for a target temperature."""
+    target_temp_c: float | None = Field(None, description="Target temperature in °C (e.g. -78, 0, -42)")
+
+
+@mcp.tool()
+async def lookup_cooling_bath(params: LookupCoolingBathInput) -> str:
+    """Find cooling bath recipes. Provide target temp → get recipe. Covers -196°C (liq N₂) to +100°C. Common: -78°C dry ice/acetone, -42°C MeCN/dry ice, 0°C ice/water, -15°C ice/NaCl."""
+    results = lookup_cooling_bath(params.target_temp_c)
+    if not results:
+        return "No cooling bath data available."
+    lines = ["**Cooling Bath Recipes**"]
+    for b in results:
+        lines.append(f"  **{b['temp']}°C** — {b['recipe']}")
+        if b.get("notes"):
+            lines.append(f"    _{b['notes']}_")
+    return "\n".join(lines)
+
+
+class LookupTLCStainInput(BaseModel):
+    """Search TLC stain recipes."""
+    query: str = Field(description="Functional group or stain name (e.g. 'amine', 'aldehyde', 'KMnO4', 'CAM', 'ninhydrin', 'UV')")
+
+
+@mcp.tool()
+async def lookup_tlc_stain(params: LookupTLCStainInput) -> str:
+    """Search TLC stain recipes by functional group or stain name. Returns: recipe, preparation, visualization procedure, and which functional groups each stain detects. Covers: KMnO₄, CAM, ninhydrin, anisaldehyde, vanillin, DNP, PMA, Dragendorff, I₂, UV."""
+    results = lookup_tlc_stain(params.query)
+    if not results:
+        return f"No TLC stains found for '{params.query}'. Try: amine, alcohol, aldehyde, KMnO4, CAM, ninhydrin, UV, universal."
+    lines = []
+    for s in results[:8]:
+        lines.append(f"## {s['name']}")
+        if s.get("targets"):
+            targets = s["targets"] if isinstance(s["targets"], str) else ", ".join(s["targets"])
+            lines.append(f"**Detects:** {targets}")
+        if s.get("recipe"):
+            lines.append(f"**Recipe:** {s['recipe']}")
+        if s.get("procedure"):
+            lines.append(f"**Procedure:** {s['procedure']}")
+        if s.get("color"):
+            lines.append(f"**Color:** {s['color']}")
+        lines.append("")
+    return "\n".join(lines)
+
+
+class LookupColumnInput(BaseModel):
+    """Column chromatography guidance."""
+    query: str = Field(description="Topic: 'solvent selection', 'loading', 'Rf', 'troubleshooting', 'streaking', 'gradient', 'dry loading', or specific problem")
+
+
+@mcp.tool()
+async def lookup_column_chromatography(params: LookupColumnInput) -> str:
+    """Column chromatography guide. Search for: solvent selection, loading methods, Rf rules, troubleshooting (streaking, poor separation, compound stuck), gradient tips, fraction size, flow rate. Includes 8 common solvent systems."""
+    results = lookup_column_guide(params.query)
+
+    if isinstance(results, dict):
+        lines = []
+        for section, content in results.items():
+            lines.append(f"## {section}")
+            if isinstance(content, list):
+                for item in content:
+                    lines.append(f"  • {item}")
+            elif isinstance(content, dict):
+                for k, v in content.items():
+                    lines.append(f"  **{k}:** {v}")
+            else:
+                lines.append(f"  {content}")
+            lines.append("")
+        # Append solvent systems
+        lines.append("## Common Solvent Systems (Normal Phase)")
+        for sys in CHROM_SOLVENT_SYSTEMS:
+            lines.append(f"  • {sys.get('system', '')}: {sys.get('polarity', '')} — {sys.get('use', '')}")
+        return "\n".join(lines)
+
+    elif isinstance(results, list):
+        return "\n".join(str(r) for r in results)
+    else:
+        return str(results)
+
+
+# =============================================================================
+# Peptide Chemistry — p2smi tools (6 tools)
+# =============================================================================
+
+
+class PeptideToSmilesInput(BaseModel):
+    """Convert peptide sequence to SMILES."""
+    sequence: str = Field(description="Amino acid sequence in 1-letter codes (supports 450+ AAs including NCAAs from SwissSidechain)")
+    cyclization: str = Field("", description="Cyclization type: '' (linear), 'SS' (disulfide), 'HT' (head-to-tail), 'SCNT', 'SCCT', 'SCSC', or manual pattern like 'SSXXXCXXXCX'")
+
+
+@mcp.tool()
+async def peptide_to_smiles(params: PeptideToSmilesInput) -> str:
+    """Convert peptide sequence to SMILES. Supports 450+ amino acids (canonical + noncanonical from SwissSidechain), D-stereochemistry, and 5 cyclization types: disulfide, head-to-tail, sidechain-to-sidechain, sidechain-to-N-term, sidechain-to-C-term."""
+    try:
+        result = sequence_to_smiles(params.sequence, params.cyclization)
+        lines = [f"**Peptide → SMILES**"]
+        lines.append(f"Sequence: {result['sequence']}")
+        lines.append(f"Type: {result['type']}")
+        if result.get('applied_constraint'):
+            lines.append(f"Constraint: {result['applied_constraint']}")
+        lines.append(f"SMILES: {result['smiles']}")
+        return "\n".join(lines)
+    except Exception as e:
+        return f"Error converting sequence: {e}"
+
+
+class PeptideCyclizationInput(BaseModel):
+    """Check cyclization options for a peptide."""
+    sequence: str = Field(description="Amino acid sequence")
+
+
+@mcp.tool()
+async def peptide_cyclization_options(params: PeptideCyclizationInput) -> str:
+    """Check which cyclization types a peptide sequence supports. Analyzes residues for disulfide-capable (Cys), nucleophilic sidechain (Lys, Ser, etc.), and electrophilic sidechain (Asp, Glu, etc.) positions."""
+    try:
+        result = get_cyclization_options(params.sequence)
+        lines = [f"**Cyclization Options for {result['sequence']}** (length {result['length']})"]
+        if result["num_options"] == 0:
+            lines.append("No cyclization options available for this sequence.")
+        else:
+            lines.append(f"Found {result['num_options']} options:")
+            for opt in result["cyclization_options"]:
+                lines.append(f"  • **{opt['type']}** — pattern: {opt['constraint_pattern']}")
+        return "\n".join(lines)
+    except Exception as e:
+        return f"Error: {e}"
+
+
+class GeneratePeptidesInput(BaseModel):
+    """Generate random peptide sequences."""
+    num_sequences: int = Field(10, description="Number of peptides to generate (max 100)")
+    min_length: int = Field(8, description="Minimum sequence length")
+    max_length: int = Field(20, description="Maximum sequence length")
+    noncanonical_percent: float = Field(0.0, description="Fraction of noncanonical amino acids (0-1)")
+    dextro_percent: float = Field(0.0, description="Fraction of D-amino acids (0-1)")
+    cyclization: str = Field("none", description="Cyclization: 'none', 'all', or comma-separated: 'SS,HT,SCSC,SCNT,SCCT'")
+
+
+@mcp.tool()
+async def generate_peptide_library(params: GeneratePeptidesInput) -> str:
+    """Generate random peptide sequences with controlled properties. Supports noncanonical amino acids (100+ from SwissSidechain), D-stereochemistry, and 5 cyclization types. Useful for library design and computational peptide chemistry."""
+    try:
+        result = generate_peptides(
+            num_sequences=params.num_sequences,
+            min_length=params.min_length,
+            max_length=params.max_length,
+            noncanonical_percent=params.noncanonical_percent,
+            dextro_percent=params.dextro_percent,
+            cyclization=params.cyclization,
+        )
+        lines = [f"**Generated {result['num_generated']} peptides**"]
+        p = result["parameters"]
+        lines.append(f"Length: {p['min_length']}–{p['max_length']}, NCAA: {p['noncanonical_percent']:.0%}, D-AA: {p['dextro_percent']:.0%}, cyclization: {p['cyclization']}")
+        lines.append("")
+        for seq in result["sequences"]:
+            lines.append(f"  {seq['id']}: {seq['sequence']} (len={seq['length']})")
+        return "\n".join(lines)
+    except Exception as e:
+        return f"Error: {e}"
+
+
+class PeptidePropertiesInput(BaseModel):
+    """Compute molecular properties for a peptide SMILES."""
+    smiles: str = Field(description="Peptide SMILES string (use peptide_to_smiles to convert from sequence first)")
+
+
+@mcp.tool()
+async def peptide_properties(params: PeptidePropertiesInput) -> str:
+    """Compute peptide molecular properties from SMILES: molecular weight, formula, logP, TPSA, H-bond donors/acceptors, rotatable bonds, ring count, fraction Csp3, heavy atoms, formal charge, and Lipinski Rule-of-5 evaluation."""
+    try:
+        result = get_peptide_properties(params.smiles)
+        lines = ["**Peptide Molecular Properties**"]
+        for k, v in result.items():
+            if k == "SMILES":
+                continue
+            lines.append(f"  {k}: {v}")
+        return "\n".join(lines)
+    except Exception as e:
+        return f"Error: {e}"
+
+
+class CheckSynthesisInput(BaseModel):
+    """Check peptide synthesis feasibility."""
+    sequence: str = Field(description="Amino acid sequence (natural amino acids, 1-letter codes)")
+
+
+@mcp.tool()
+async def check_peptide_synthesis(params: CheckSynthesisInput) -> str:
+    """Evaluate solid-phase peptide synthesis (SPPS) feasibility. Checks: forbidden motifs (consecutive Pro, DG/DP, N/Q at N-term), cysteine overload, C-terminal Pro/Cys, glycine runs, length limits, hydrophobicity, and charge distribution."""
+    try:
+        result = check_synthesis_feasibility(params.sequence)
+        lines = [f"**SPPS Synthesis Check: {result['sequence']}** (length {result['length']})"]
+        lines.append(f"Verdict: **{result['verdict']}**")
+        if result["issues"]:
+            lines.append(f"Issues ({result['num_issues']}):")
+            for issue in result["issues"]:
+                lines.append(f"  ⚠ {issue}")
+        else:
+            lines.append("✓ No synthesis issues detected — sequence passes all checks.")
+        return "\n".join(lines)
+    except Exception as e:
+        return f"Error: {e}"
+
+
+class ModifyPeptideInput(BaseModel):
+    """Apply chemical modifications to peptide SMILES."""
+    smiles: str = Field(description="Peptide SMILES string")
+    n_methylation: bool = Field(False, description="Apply random N-methylation to amide bonds")
+    pegylation: bool = Field(False, description="Apply random PEGylation")
+    methylation_fraction: float = Field(0.3, description="Fraction of amide sites to N-methylate (0-1)")
+
+
+@mcp.tool()
+async def modify_peptide(params: ModifyPeptideInput) -> str:
+    """Apply N-methylation and/or PEGylation to a peptide SMILES. N-methylation improves metabolic stability and membrane permeability. PEGylation increases solubility and plasma half-life. Returns modified SMILES with validation."""
+    try:
+        result = modify_peptide_smiles(
+            params.smiles,
+            n_methylation=params.n_methylation,
+            pegylation=params.pegylation,
+            methylation_fraction=params.methylation_fraction,
+        )
+        lines = ["**Peptide Modification**"]
+        lines.append(f"Modifications: {', '.join(result['modifications_applied']) or 'None'}")
+        lines.append(f"Valid SMILES: {result['valid_smiles']}")
+        if result["modified_smiles"]:
+            lines.append(f"Modified SMILES: {result['modified_smiles']}")
+        if result.get("error"):
+            lines.append(f"Error: {result['error']}")
+        return "\n".join(lines)
+    except Exception as e:
+        return f"Error: {e}"
+
+
+# =============================================================================
+# Peptide Chemistry — pichemist pI calculation (1 tool)
+# =============================================================================
+
+
+class CalcPeptidePIInput(BaseModel):
+    """Calculate peptide isoelectric point."""
+    sequence: str | None = Field(None, description="Peptide sequence in 1-letter code (for canonical peptides)")
+    smiles: str | None = Field(None, description="SMILES string (for modified/noncanonical peptides — pichemist cuts amide bonds and predicts pKas)")
+
+
+@mcp.tool()
+async def calculate_peptide_pi(params: CalcPeptidePIInput) -> str:
+    """Calculate peptide isoelectric point (pI) using AstraZeneca's pichemist. Uses 8 different pKa reference sets (IPC2, ProMoST, Gauci, Grimsley, Thurlkill, Lehninger, Toseland) for consensus pI with error bars. Also returns charge at pH 7.4. Accepts FASTA sequence or SMILES (for modified peptides with noncanonical AAs)."""
+    try:
+        if params.sequence:
+            result = calculate_pi_from_sequence(params.sequence)
+        elif params.smiles:
+            result = calculate_pi_from_smiles(params.smiles)
+        else:
+            return "Error: provide either sequence or smiles"
+
+        if "error" in result:
+            return f"Error: {result['error']}"
+
+        lines = ["**Isoelectric Point (pI) Calculation** — pichemist (AstraZeneca)"]
+        if result.get("sequence"):
+            lines.append(f"Sequence: {result['sequence']}")
+        if result.get("smiles"):
+            lines.append(f"SMILES: {result['smiles'][:80]}...")
+
+        lines.append(f"\n**Consensus pI: {result['pI_mean']:.2f} ± {result.get('pI_std', 0):.2f}**")
+        lines.append(f"pI interval: {result.get('pI_interval', 'N/A')}")
+        lines.append(f"Charge at pH 7.4: {result.get('charge_at_pH7_mean', 'N/A'):.2f}")
+
+        pi_methods = result.get("pI_by_method", {})
+        if pi_methods:
+            lines.append("\npI by reference set:")
+            for method, val in pi_methods.items():
+                lines.append(f"  {method}: {val}")
+
+        return "\n".join(lines)
+    except Exception as e:
+        return f"Error calculating pI: {e}"
+
+
+# =============================================================================
+# Peptide Chemistry — pep-calc.com API (1 tool, combines properties + MS)
+# =============================================================================
+
+
+class PepCalcInput(BaseModel):
+    """Get peptide properties from pep-calc.com API."""
+    sequence: str = Field(description="Peptide sequence (1-letter code, max 150 residues). Non-standard AAs in parentheses: (pS) for phosphoserine")
+    n_term: str = Field("H", description="N-terminus: 'H' (free amine), 'Ac' (acetylated), etc.")
+    c_term: str = Field("OH", description="C-terminus: 'OH' (free acid), 'NH2' (amidated), etc.")
+
+
+@mcp.tool()
+async def calculate_peptide_extinction(params: PepCalcInput) -> str:
+    """Calculate peptide properties via pep-calc.com: MW, formula, pI, charge summary, and extinction coefficient at 280nm (oxidized/reduced). Supports 120+ amino acids including phospho-residues. Free API, no key required."""
+    try:
+        result = await pep_calc_properties(params.sequence, params.n_term, params.c_term)
+        if result.get("basic_error"):
+            return f"pep-calc.com API error: {result['basic_error']}. The API may be unreachable from this network. Use calculate_peptide_pi for pI and peptide_properties for MW/properties as alternatives."
+
+        lines = ["**Peptide Properties** — pep-calc.com"]
+        lines.append(f"Sequence: {params.sequence}")
+        lines.append(f"Termini: N={params.n_term}, C={params.c_term}")
+        for k, v in result.items():
+            if v is not None and not k.endswith("_error"):
+                label = k.replace("_", " ").title()
+                lines.append(f"  {label}: {v}")
+        return "\n".join(lines)
+    except Exception as e:
+        return f"Error: {e}. The pep-calc.com API may be unreachable. Use peptide_properties and calculate_peptide_pi as local alternatives."
+
+
+# =============================================================================
+# Peptide MS — pep-calc.com ion series & peak assignment (2 tools)
+# =============================================================================
+
+
+class PepCalcIonsInput(BaseModel):
+    """Get peptide fragment ion series for MS/MS."""
+    sequence: str = Field(description="Peptide sequence (1-letter codes, max 150 residues)")
+    n_term: str = Field("H", description="N-terminus: 'H' or 'Ac'")
+    c_term: str = Field("OH", description="C-terminus: 'OH' or 'NH2'")
+
+
+@mcp.tool()
+async def get_peptide_ion_series(params: PepCalcIonsInput) -> str:
+    """Get peptide MS/MS fragment ion series (b, y, a, c, z ions) for tandem mass spectrometry interpretation. Returns theoretical m/z values for each ion type at every cleavage position. Essential for de novo sequencing and spectral annotation."""
+    try:
+        result = await pep_calc_ion_series(params.sequence, params.n_term, params.c_term)
+        if not result:
+            return "pep-calc.com API returned no data. The API may be unreachable."
+        lines = [f"**Peptide Ion Series** — {params.sequence}"]
+        lines.append(f"Termini: N={params.n_term}, C={params.c_term}")
+        for key, value in result.items():
+            if isinstance(value, list) and value:
+                lines.append(f"\n**{key} ions:**")
+                for i, mz in enumerate(value, 1):
+                    lines.append(f"  {key}{i}: {mz}")
+            elif isinstance(value, (int, float)):
+                lines.append(f"{key}: {value}")
+        return "\n".join(lines)
+    except Exception as e:
+        return f"Error: {e}. The pep-calc.com API may be unreachable."
+
+
+class PepCalcMSAssignInput(BaseModel):
+    """Assign MS peaks to peptide fragments."""
+    sequence: str = Field(description="Peptide sequence (1-letter codes)")
+    mz_values: list[float] = Field(description="Observed m/z values to assign")
+    n_term: str = Field("H", description="N-terminus")
+    c_term: str = Field("OH", description="C-terminus")
+
+
+@mcp.tool()
+async def assign_peptide_ms_peaks(params: PepCalcMSAssignInput) -> str:
+    """Assign observed m/z peaks to peptide deletions, modifications, or fragment ions using pep-calc.com. Helps identify impurities, truncations, and post-translational modifications in MALDI/ESI-MS data."""
+    try:
+        result = await pep_calc_ms_assign(
+            params.sequence, params.mz_values, params.n_term, params.c_term
+        )
+        if not result:
+            return "pep-calc.com API returned no data."
+        lines = [f"**MS Peak Assignment** — {params.sequence}"]
+        lines.append(f"Query peaks: {params.mz_values}")
+        if isinstance(result, dict):
+            for key, value in result.items():
+                if isinstance(value, list):
+                    lines.append(f"\n**{key}:**")
+                    for item in value[:20]:
+                        lines.append(f"  {item}")
+                else:
+                    lines.append(f"{key}: {value}")
+        elif isinstance(result, list):
+            for item in result[:30]:
+                lines.append(f"  {item}")
+        return "\n".join(lines)
+    except Exception as e:
+        return f"Error: {e}. The pep-calc.com API may be unreachable."
+
+
+# =============================================================================
+# Bench Chemistry Expansion — buffers, amino acids, NMR solvents (3 tools)
+# =============================================================================
+
+
+class LookupBufferInput(BaseModel):
+    """Search buffer recipes."""
+    query: str = Field(description="Buffer name, pH value, category, or keyword (e.g. 'PBS', 'Tris', '7.4', 'electrophoresis', 'lysis', 'Western')")
+
+
+@mcp.tool()
+async def lookup_buffer_recipe(params: LookupBufferInput) -> str:
+    """Search 20+ common laboratory buffer recipes. Returns: exact recipe with masses, preparation steps, pH range, pKa, and practical notes. Covers: PBS, TBS, Tris, HEPES, MES, MOPS, PIPES, citrate, acetate, carbonate, TAE, TBE, SDS-PAGE, transfer buffer, TE, RIPA lysis."""
+    results = _lookup_buffer(params.query)
+    if not results:
+        return f"No buffer recipes found for '{params.query}'. Try: PBS, Tris, HEPES, TAE, TBE, SDS-PAGE, lysis, or a pH value."
+    lines = []
+    for buf in results[:5]:
+        lines.append(f"## {buf['name']} (pH {buf['pH']})")
+        lines.append(f"**Recipe:** {buf['recipe']}")
+        lines.append(f"**Preparation:** {buf['preparation']}")
+        lines.append(f"**pKa:** {buf.get('pKa', 'N/A')}, effective range: {buf.get('range', 'N/A')}")
+        if buf.get("notes"):
+            lines.append(f"**Notes:** {buf['notes']}")
+        lines.append("")
+    if len(results) > 5:
+        lines.append(f"*…and {len(results) - 5} more results*")
+    return "\n".join(lines)
+
+
+class LookupAAInput(BaseModel):
+    """Look up amino acid properties."""
+    query: str = Field(description="1-letter code (e.g. 'C'), 3-letter code ('Cys'), full name ('Cysteine'), property class ('aromatic', 'polar', 'charged'), or 'all' for the full table")
+
+
+@mcp.tool()
+async def lookup_amino_acid_properties(params: LookupAAInput) -> str:
+    """Look up amino acid properties: MW (residue), pKa values (α-carboxyl, α-amino, sidechain), pI, Kyte-Doolittle hydropathy index, structural class, and practical notes (UV absorption, phosphorylation, reactivity). Covers all 20 canonical amino acids."""
+    results = _lookup_amino_acid(params.query)
+    if not results:
+        return f"No amino acids found for '{params.query}'. Use 1-letter code (C), 3-letter (Cys), name (Cysteine), class (aromatic), or 'all'."
+    lines = []
+    for aa in results[:20]:
+        pka_side = f"{aa['pKa_side']}" if aa['pKa_side'] else "—"
+        lines.append(f"**{aa['code1']} ({aa['code3']}) — {aa['name']}** [{aa['class']}]")
+        lines.append(f"  MW(residue): {aa['mw']:.2f} Da | pI: {aa['pI']} | Hydropathy: {aa['hydropathy']}")
+        lines.append(f"  pKₐ: α-COOH={aa['pKa_carboxyl']}, α-NH₂={aa['pKa_amino']}, sidechain={pka_side}")
+        if aa.get("notes"):
+            lines.append(f"  _{aa['notes']}_")
+        lines.append("")
+    return "\n".join(lines)
+
+
+class LookupNMRSolventInput(BaseModel):
+    """Search NMR solvent reference."""
+    query: str = Field(description="Solvent name or abbreviation (e.g. 'CDCl3', 'DMSO', 'D2O', 'methanol') or 'all' for complete table")
+
+
+@mcp.tool()
+async def lookup_nmr_solvent(params: LookupNMRSolventInput) -> str:
+    """NMR solvent reference: residual ¹H and ¹³C chemical shifts, water peak position, multiplicity, boiling point, density. Covers: CDCl₃, DMSO-d₆, MeOD, D₂O, acetone-d₆, MeCN-d₃, C₆D₆, THF-d₈, CD₂Cl₂, DMF-d₇, pyridine-d₅, TFA-d. Essential for spectral interpretation and thesis writing."""
+    results = _lookup_nmr_solvent(params.query)
+    if not results:
+        return f"No NMR solvents found for '{params.query}'. Try: CDCl3, DMSO, D2O, MeOD, acetone, benzene, THF, or 'all'."
+    lines = []
+    for sol in results[:12]:
+        lines.append(f"## {sol['name']} ({sol['abbrev']})")
+        lines.append(f"  ¹H residual: {sol['h_residual']} ppm")
+        if sol.get("c_residual"):
+            lines.append(f"  ¹³C residual: {sol['c_residual']} ppm ({sol.get('c_multiplicity', '')})")
+        if sol.get("water_peak"):
+            lines.append(f"  Water peak: {sol['water_peak']} ppm")
+        lines.append(f"  bp: {sol['bp']}°C, d={sol['density']} g/mL")
+        if sol.get("notes"):
+            lines.append(f"  _{sol['notes']}_")
+        lines.append("")
+    return "\n".join(lines)
+
+
+# =============================================================================
+# Chemistry Utilities — isotope pattern, CAS, units, periodic table, pH (6 tools)
+# =============================================================================
+
+
+class IsotopePatternInput(BaseModel):
+    """Calculate isotope distribution."""
+    formula: str = Field("", description="Molecular formula (e.g. 'C9H8O4', 'C14H19N3O4S')")
+    smiles: str = Field("", description="SMILES string (alternative — formula auto-extracted)")
+    charge: int = Field(1, description="Charge state for m/z calculation (default 1 for [M+H]⁺)")
+    top_n: int = Field(8, description="Number of peaks to return")
+
+
+@mcp.tool()
+async def calculate_isotope_pattern(params: IsotopePatternInput) -> str:
+    """Calculate theoretical isotope distribution from molecular formula or SMILES. Returns monoisotopic mass, average mass, and isotope envelope (m/z + relative abundance). Essential for mass spec data interpretation, especially for compounds containing Cl, Br, S."""
+    result = _calc_isotope_pattern(
+        formula=params.formula, smiles=params.smiles,
+        charge=params.charge, top_n=params.top_n,
+    )
+    if result.get("error"):
+        return f"Error: {result['error']}"
+    lines = [f"**Isotope Pattern — {result['formula']}** (z={result['charge']})"]
+    lines.append(f"Monoisotopic mass: {result['monoisotopic_mass']} Da")
+    lines.append(f"Monoisotopic m/z: {result['monoisotopic_mz']}")
+    lines.append(f"Average mass: {result['average_mass']} Da")
+    lines.append("\nIsotope envelope:")
+    for p in result["pattern"]:
+        bar = "█" * int(p["relative"] / 2)
+        lines.append(f"  m/z {p['mz']:.4f}: {p['relative']:6.2f}% {bar}")
+    return "\n".join(lines)
+
+
+class ValidateCASInput(BaseModel):
+    """Validate CAS registry number."""
+    cas_number: str = Field(description="CAS number (e.g. '50-78-2' for aspirin, or '50782')")
+
+
+@mcp.tool()
+async def validate_cas_number(params: ValidateCASInput) -> str:
+    """Validate a CAS registry number by checking the check digit. Returns whether the number is valid and the properly formatted CAS string. Useful for verifying catalog numbers and safety data lookup."""
+    result = _validate_cas(params.cas_number)
+    if result["valid"]:
+        return f"✓ **{result['cas']}** is a valid CAS registry number."
+    else:
+        return f"✗ **{result['cas']}** is NOT valid: {result['error']}"
+
+
+class ConvertUnitsInput(BaseModel):
+    """Convert between scientific units."""
+    value: float = Field(description="Numeric value to convert")
+    from_unit: str = Field(description="Source unit (e.g. 'kcal/mol', 'Å', '°C', 'mg', 'mL', 'atm', 'mmol')")
+    to_unit: str = Field(description="Target unit (must be same category as source)")
+
+
+@mcp.tool()
+async def convert_units(params: ConvertUnitsInput) -> str:
+    """Convert between scientific units. Supports: mass (g↔mg↔μg↔Da↔kDa), volume (L↔mL↔μL), length (m↔nm↔Å↔pm), energy (J↔kJ↔kcal↔kcal/mol↔kJ/mol↔eV↔hartree↔cm⁻¹), pressure (Pa↔atm↔bar↔torr↔mmHg), time (s↔ms↔μs↔ns↔min↔h), amount (mol↔mmol↔μmol), temperature (°C↔°F↔K)."""
+    result = _convert_units(params.value, params.from_unit, params.to_unit)
+    if result.get("error"):
+        return f"Error: {result['error']}"
+    r = result["result"]
+    # Smart formatting
+    if abs(r) >= 1000 or (abs(r) < 0.001 and r != 0):
+        r_str = f"{r:.6e}"
+    else:
+        r_str = f"{r:.6g}"
+    return f"**{params.value} {params.from_unit}** = **{r_str} {params.to_unit}** ({result['category']})"
+
+
+class LookupElementInput(BaseModel):
+    """Look up periodic table element."""
+    query: str = Field(description="Element symbol (Fe), name (Iron), or atomic number (26)")
+
+
+@mcp.tool()
+async def lookup_periodic_table(params: LookupElementInput) -> str:
+    """Look up element properties from the periodic table: atomic number, atomic mass, electron configuration, electronegativity (Pauling), group, period, block, and category. Covers all commonly encountered elements in organic, inorganic, and materials chemistry."""
+    result = _lookup_element(params.query)
+    if result is None:
+        return f"Element '{params.query}' not found. Try symbol (Fe), name (Iron), or atomic number (26)."
+    if isinstance(result, list):
+        lines = [f"Multiple matches for '{params.query}':"]
+        for el in result[:10]:
+            lines.append(f"  **{el['symbol']}** (Z={el['Z']}) — {el['name']}: {el['mass']} g/mol")
+        return "\n".join(lines)
+    el = result
+    lines = [f"## {el['symbol']} — {el['name']}"]
+    lines.append(f"  Atomic number: {el['Z']}")
+    lines.append(f"  Atomic mass: {el['mass']} g/mol")
+    lines.append(f"  Electron config: {el['config']}")
+    en = f"{el['en']}" if el['en'] else "N/A"
+    lines.append(f"  Electronegativity (Pauling): {en}")
+    lines.append(f"  Group: {el.get('group', 'N/A')}, Period: {el['period']}, Block: {el['block']}")
+    lines.append(f"  Category: {el['category']}")
+    return "\n".join(lines)
+
+
+class CalcBufferPHInput(BaseModel):
+    """Henderson-Hasselbalch buffer pH calculator."""
+    pKa: float | None = Field(None, description="pKa of the buffer acid/base pair")
+    buffer_name: str | None = Field(None, description="Buffer name to look up pKa (e.g. 'Tris', 'HEPES', 'phosphate_2', 'acetate')")
+    acid_conc: float | None = Field(None, description="Concentration of acid form [HA]")
+    base_conc: float | None = Field(None, description="Concentration of conjugate base form [A⁻]")
+    ratio_base_acid: float | None = Field(None, description="[A⁻]/[HA] ratio (alternative to concentrations)")
+    target_ph: float | None = Field(None, description="Target pH → calculates required ratio")
+
+
+@mcp.tool()
+async def calculate_buffer_ph(params: CalcBufferPHInput) -> str:
+    """Henderson-Hasselbalch calculator. Two modes: (1) Given pKa + concentrations → calculate pH. (2) Given pKa + target pH → calculate required acid:base ratio. Knows pKa for 20+ common buffers: Tris (8.07), HEPES (7.55), phosphate (7.20), MOPS (7.20), MES (6.15), acetate (4.76), etc."""
+    result = _calc_buffer_ph(
+        pKa=params.pKa,
+        buffer_name=params.buffer_name,
+        acid_conc=params.acid_conc,
+        base_conc=params.base_conc,
+        ratio_base_acid=params.ratio_base_acid,
+        target_ph=params.target_ph,
+    )
+    if result.get("error"):
+        return f"Error: {result['error']}"
+    lines = [f"**Buffer pH Calculation** (Henderson-Hasselbalch)"]
+    lines.append(f"pKa: {result['pKa']}")
+    if result.get("buffer"):
+        lines.append(f"Buffer: {result['buffer']}")
+    if result.get("species"):
+        lines.append(f"Species: {result['species']}")
+    lines.append(f"Effective range: {result['buffer_range']}")
+    if "calculated_pH" in result:
+        lines.append(f"\n**Calculated pH: {result['calculated_pH']}**")
+        lines.append(f"[A⁻]/[HA] ratio: {result['ratio_base_acid']}")
+    if "target_pH" in result:
+        lines.append(f"\nTarget pH: {result['target_pH']}")
+        lines.append(f"**Required [A⁻]/[HA] ratio: {result['required_ratio_base_acid']}**")
+        if result.get("note"):
+            lines.append(result["note"])
+    if result.get("warning"):
+        lines.append(f"\n⚠️ {result['warning']}")
+    return "\n".join(lines)
+
+
+# =============================================================================
+# Writing & Publication Tools (10 tools)
+# =============================================================================
+
+# Tool 69: format_citation — DOI → formatted reference
+# =============================================================================
+
+
+class FormatCitationInput(BaseModel):
+    """Format a citation from DOI."""
+    doi: str = Field(description="DOI to format (e.g. '10.1038/s41586-020-2649-2')")
+    style: str = Field(
+        default="acs",
+        description="Citation style: 'acs' (ACS), 'apa' (APA 7th), 'nature', 'vancouver', 'chicago', 'mla', 'bibtex'"
+    )
+
+
+@mcp.tool()
+async def format_citation(params: FormatCitationInput) -> str:
+    """Format a DOI into a properly styled citation. Styles: ACS (default), APA 7th, Nature, Vancouver, Chicago, MLA, BibTeX. Uses Crossref content negotiation for authoritative metadata. Essential for manuscripts, theses, and reference lists."""
+    result = await _format_citation(params.doi, style=params.style)
+    if result.get("error"):
+        return f"Error: {result['error']}"
+    lines = [f"**{params.style.upper()} format:**\n"]
+    lines.append(result.get("formatted", ""))
+    if result.get("doi"):
+        lines.append(f"\nDOI: https://doi.org/{result['doi']}")
+    return "\n".join(lines)
+
+
+# =============================================================================
+# Tool 70: build_bibliography — batch DOIs → formatted reference list
+# =============================================================================
+
+
+class BuildBibliographyInput(BaseModel):
+    """Build a formatted bibliography."""
+    dois: list[str] = Field(description="List of DOIs to format")
+    style: str = Field(
+        default="acs",
+        description="Citation style: 'acs', 'apa', 'nature', 'vancouver', 'chicago', 'mla', 'bibtex'"
+    )
+    numbered: bool = Field(default=True, description="Number the references")
+
+
+@mcp.tool()
+async def build_bibliography(params: BuildBibliographyInput) -> str:
+    """Build a formatted bibliography from a list of DOIs. Outputs a numbered reference list in the specified style (ACS, APA, Nature, etc.). Ideal for thesis chapters, manuscript reference sections, and literature reviews."""
+    result = await _build_bibliography(params.dois, style=params.style)
+    if result.get("error"):
+        return f"Error: {result['error']}"
+    entries = result.get("entries", [])
+    if not entries:
+        return "No citations could be formatted."
+    lines = [f"**Bibliography ({params.style.upper()}, {len(entries)} references)**\n"]
+    for i, entry in enumerate(entries, 1):
+        prefix = f"{i}. " if params.numbered else "• "
+        if entry.get("error"):
+            lines.append(f"{prefix}[Error for {entry.get('doi', '?')}]: {entry['error']}")
+        else:
+            lines.append(f"{prefix}{entry.get('formatted', '')}")
+    if result.get("errors"):
+        lines.append(f"\n⚠️ {result['errors']} DOI(s) could not be resolved.")
+    return "\n".join(lines)
+
+
+# =============================================================================
+# Tool 71: lookup_iupac_name — SMILES → IUPAC name
+# =============================================================================
+
+
+class IUPACNameInput(BaseModel):
+    """Look up IUPAC name from SMILES."""
+    smiles: str = Field(description="SMILES string (e.g. 'CC(=O)Oc1ccccc1C(=O)O' for aspirin)")
+
+
+@mcp.tool()
+async def lookup_iupac_name(params: IUPACNameInput) -> str:
+    """Convert a SMILES string to its IUPAC systematic name using PubChem. Returns the preferred IUPAC name along with any common synonyms. Useful for writing experimental sections and compound characterization."""
+    result = await _iupac_from_smiles(params.smiles)
+    if result.get("error"):
+        return f"Error: {result['error']}"
+    lines = []
+    if result.get("iupac_name"):
+        lines.append(f"**IUPAC Name:** {result['iupac_name']}")
+    if result.get("cid"):
+        lines.append(f"PubChem CID: {result['cid']}")
+    if result.get("molecular_formula"):
+        lines.append(f"Formula: {result['molecular_formula']}")
+    if result.get("synonyms"):
+        syns = result["synonyms"][:5]
+        lines.append(f"Synonyms: {', '.join(syns)}")
+    return "\n".join(lines) if lines else "No IUPAC name found for this SMILES."
+
+
+# =============================================================================
+# Tool 72: name_to_smiles — compound name → SMILES
+# =============================================================================
+
+
+class NameToSMILESInput(BaseModel):
+    """Convert compound name to SMILES."""
+    name: str = Field(description="Compound name (e.g. 'caffeine', 'ibuprofen', 'Fmoc-Gly-OH')")
+
+
+@mcp.tool()
+async def name_to_smiles(params: NameToSMILESInput) -> str:
+    """Convert a compound name to its SMILES string using PubChem. Returns canonical and isomeric SMILES, InChI, InChIKey, molecular formula, and MW. Useful for quickly getting machine-readable structures from common names, trade names, or reagent labels."""
+    result = await _smiles_from_name(params.name)
+    if result.get("error"):
+        return f"Error: {result['error']}"
+    lines = [f"**{params.name}**\n"]
+    if result.get("canonical_smiles"):
+        lines.append(f"Canonical SMILES: `{result['canonical_smiles']}`")
+    if result.get("isomeric_smiles"):
+        lines.append(f"Isomeric SMILES: `{result['isomeric_smiles']}`")
+    if result.get("inchi"):
+        lines.append(f"InChI: `{result['inchi']}`")
+    if result.get("inchikey"):
+        lines.append(f"InChIKey: `{result['inchikey']}`")
+    if result.get("molecular_formula"):
+        lines.append(f"Formula: {result['molecular_formula']}")
+    if result.get("molecular_weight"):
+        lines.append(f"MW: {result['molecular_weight']} g/mol")
+    if result.get("cid"):
+        lines.append(f"PubChem CID: {result['cid']}")
+    return "\n".join(lines)
+
+
+# =============================================================================
+# Tool 73: format_molecular_formula — formula → LaTeX/HTML/Unicode
+# =============================================================================
+
+
+class FormatFormulaInput(BaseModel):
+    """Format molecular formula with proper subscripts."""
+    formula: str = Field(description="Molecular formula (e.g. 'C6H12O6', 'CH3CO2H', 'Fe2O3')")
+    output_format: str = Field(
+        default="all",
+        description="Output format: 'unicode' (C₆H₁₂O₆), 'latex' (\\ce{...}), 'html' (<sub>), or 'all'"
+    )
+
+
+@mcp.tool()
+async def format_molecular_formula(params: FormatFormulaInput) -> str:
+    """Format a molecular formula with proper subscript notation. Outputs in Unicode (C₆H₁₂O₆), LaTeX (\\ce{C6H12O6}), HTML (<sub>6</sub>), or all formats. Handles complex formulae including parentheses and charges. Essential for manuscripts, theses, and presentations."""
+    if params.output_format == "all":
+        results = {}
+        for fmt in ("unicode", "latex", "html"):
+            r = _format_molecular_formula(params.formula, output_format=fmt)
+            results[fmt] = r
+        lines = [f"**{params.formula}** — formatted:\n"]
+        u = results.get("unicode", {})
+        if u.get("unicode"):
+            lines.append(f"Unicode:  {u['unicode']}")
+        la = results.get("latex", {})
+        if la.get("latex_inline"):
+            lines.append(f"LaTeX:    `{la['latex_inline']}`")
+        if la.get("latex_ce"):
+            lines.append(f"mhchem:   `{la['latex_ce']}`")
+        h = results.get("html", {})
+        if h.get("html"):
+            lines.append(f"HTML:     `{h['html']}`")
+        return "\n".join(lines)
+    else:
+        result = _format_molecular_formula(params.formula, output_format=params.output_format)
+        if result.get("error"):
+            return f"Error: {result['error']}"
+        lines = [f"**{params.formula}** ({params.output_format}):\n"]
+        for key, val in result.items():
+            if key != "formula" and key != "format":
+                lines.append(f"{key}: `{val}`" if "{" in str(val) or "<" in str(val) else f"{key}: {val}")
+        return "\n".join(lines)
+
+
+# =============================================================================
+# Tool 74: lookup_experimental_template — reaction type → experimental section
+# =============================================================================
+
+
+class ExperimentalTemplateInput(BaseModel):
+    """Look up experimental section template."""
+    query: str = Field(
+        description="Reaction type (e.g. 'suzuki', 'amide coupling', 'grignard', 'hydrogenation', "
+        "'reductive amination', 'esterification', 'wittig', 'peptide coupling') or 'all' for the full list"
+    )
+
+
+@mcp.tool()
+async def lookup_experimental_template(params: ExperimentalTemplateInput) -> str:
+    """Get a template for writing the Experimental section of a paper or thesis. Covers 18 common reaction types (cross-coupling, oxidation, reduction, heterocycle synthesis, etc.) with fill-in-the-blank templates that follow journal conventions. Each template includes: reaction setup, workup, purification, and characterization data format."""
+    result = _lookup_experimental_template(params.query)
+    if result is None:
+        return f"No template found for '{params.query}'. Try 'all' to see available templates."
+    if isinstance(result, list):
+        # Multiple matches or listing
+        lines = [f"**Experimental templates matching '{params.query}'** ({len(result)} results):\n"]
+        for tmpl in result:
+            lines.append(f"- **{tmpl['name']}** ({tmpl.get('category', 'General')})")
+        lines.append("\nRequest a specific template by name for the full text.")
+        return "\n".join(lines)
+    # Single result
+    t = result
+    lines = [f"## {t['name']}"]
+    if t.get("category"):
+        lines.append(f"Category: {t['category']}\n")
+    lines.append("### Template\n")
+    lines.append(t.get("template", ""))
+    if t.get("notes"):
+        lines.append(f"\n### Notes\n{t['notes']}")
+    if t.get("safety"):
+        lines.append(f"\n⚠️ **Safety:** {t['safety']}")
+    return "\n".join(lines)
+
+
+# =============================================================================
+# Tool 75: lookup_journal_guide — journal → submission formatting requirements
+# =============================================================================
+
+
+class JournalGuideInput(BaseModel):
+    """Look up journal submission guide."""
+    query: str = Field(
+        description="Journal name or abbreviation (e.g. 'JACS', 'Angew. Chem.', 'Nature Chemistry', "
+        "'JOC', 'Org. Lett.') or 'all' for the full list"
+    )
+
+
+@mcp.tool()
+async def lookup_journal_guide(params: JournalGuideInput) -> str:
+    """Look up submission formatting guidelines for major chemistry journals. Covers 12 top journals (JACS, Angew. Chem., Nature Chemistry, JOC, Org. Lett., Chemical Science, etc.). Returns: citation style, word/page limits, figure requirements, SI guidelines, common mistakes, and submission tips."""
+    result = _lookup_journal_guide(params.query)
+    if result is None:
+        return f"No guide found for '{params.query}'. Try 'all' to see available journals."
+    if isinstance(result, list):
+        lines = [f"**Journal guides matching '{params.query}'** ({len(result)} results):\n"]
+        for g in result:
+            name = g.get("name", "?")
+            pub = g.get("publisher", "")
+            lines.append(f"- **{name}** ({pub})")
+        lines.append("\nRequest a specific journal for the full guide.")
+        return "\n".join(lines)
+    g = result
+    lines = [f"## {g['name']}"]
+    if g.get("publisher"):
+        lines.append(f"Publisher: {g['publisher']}")
+    if g.get("issn"):
+        lines.append(f"ISSN: {g['issn']}")
+    lines.append("")
+    if g.get("citation_style"):
+        lines.append(f"**Citation style:** {g['citation_style']}")
+    if g.get("word_limit"):
+        lines.append(f"**Word limit:** {g['word_limit']}")
+    if g.get("page_limit"):
+        lines.append(f"**Page limit:** {g['page_limit']}")
+    if g.get("abstract_limit"):
+        lines.append(f"**Abstract limit:** {g['abstract_limit']}")
+    if g.get("figure_guidelines"):
+        lines.append(f"\n**Figures:** {g['figure_guidelines']}")
+    if g.get("si_guidelines"):
+        lines.append(f"**SI:** {g['si_guidelines']}")
+    if g.get("submission_format"):
+        lines.append(f"**Format:** {g['submission_format']}")
+    if g.get("common_mistakes"):
+        lines.append("\n**Common mistakes:**")
+        for m in g["common_mistakes"]:
+            lines.append(f"  • {m}")
+    if g.get("tips"):
+        lines.append("\n**Tips:**")
+        for tip in g["tips"]:
+            lines.append(f"  • {tip}")
+    if g.get("url"):
+        lines.append(f"\nAuthor guidelines: {g['url']}")
+    return "\n".join(lines)
+
+
+# =============================================================================
+# Tool 76: generate_si_checklist — Supporting Information checklist
+# =============================================================================
+
+
+class SIChecklistInput(BaseModel):
+    """Generate a Supporting Information checklist."""
+    compound_type: str = Field(
+        default="small molecule",
+        description="Type: 'small molecule', 'peptide', 'polymer', 'material', 'natural product'"
+    )
+    content_types: list[str] | None = Field(
+        default=None,
+        description="Analytical data included (e.g. ['1h_nmr', '13c_nmr', 'hrms', 'hplc', 'ir', 'mp', 'optical_rotation', 'x-ray']). None → standard minimum."
+    )
+
+
+@mcp.tool()
+async def generate_si_checklist(params: SIChecklistInput) -> str:
+    """Generate a Supporting Information (SI) checklist for a chemistry publication. Tailored to compound type (small molecule, peptide, polymer, material, natural product). Lists required characterization data, formatting guidelines, and common reviewer complaints. Saves time during submission preparation."""
+    result = _get_si_checklist(
+        content_types=params.content_types,
+        compound_type=params.compound_type,
+    )
+    if result.get("error"):
+        return f"Error: {result['error']}"
+    lines = [f"## SI Checklist — {result.get('compound_type', params.compound_type).title()}\n"]
+    checklist = result.get("checklist", [])
+    for item in checklist:
+        if isinstance(item, dict):
+            check = "☐"
+            lines.append(f"{check} **{item.get('item', '')}**: {item.get('details', '')}")
+        else:
+            lines.append(f"☐ {item}")
+    if result.get("general_tips"):
+        lines.append("\n**General tips:**")
+        for tip in result["general_tips"]:
+            lines.append(f"  • {tip}")
+    return "\n".join(lines)
+
+
+# =============================================================================
+# Tool 77: lookup_abbreviation — chemistry abbreviation reference
+# =============================================================================
+
+
+class LookupAbbreviationInput(BaseModel):
+    """Look up chemistry abbreviations."""
+    query: str = Field(
+        description="Abbreviation (e.g. 'THF', 'DCM', 'TEA', 'DIPEA', 'HATU', 'EDC') "
+        "or category ('solvents', 'reagents', 'protecting_groups', 'techniques', 'units', 'spectroscopy', 'general')"
+    )
+
+
+@mcp.tool()
+async def lookup_abbreviation(params: LookupAbbreviationInput) -> str:
+    """Look up chemistry abbreviations and acronyms. 193 entries across 7 categories: solvents, reagents, protecting groups, techniques, units, spectroscopy, and general chemistry. Returns full expansion. Also accepts category names to list all abbreviations in that category. Essential for decoding literature and ensuring correct abbreviation usage in manuscripts."""
+    # First try as a specific abbreviation
+    result = _lookup_abbreviation(params.query)
+    if result.get("num_results", 0) > 0:
+        lines = []
+        for abbr, data in result.get("results", {}).items():
+            lines.append(f"**{abbr}** = {data['meaning']}  ({data.get('category', '')})")
+        return "\n".join(lines)
+    # Try as category
+    result = _get_abbreviations(params.query)
+    if isinstance(result, dict) and not result.get("error"):
+        lines = [f"**{params.query.title()} abbreviations:**\n"]
+        for cat, abbrevs in result.items():
+            if isinstance(abbrevs, dict):
+                for abbr, meaning in sorted(abbrevs.items()):
+                    lines.append(f"  **{abbr}** = {meaning}")
+        return "\n".join(lines) if len(lines) > 1 else f"No abbreviations found for '{params.query}'."
+    return f"Abbreviation '{params.query}' not found. Try a specific abbreviation or category: solvents, reagents, protecting_groups, techniques, units, spectroscopy, general."
+
+
+# =============================================================================
+# Tool 78: get_thesis_guide — thesis section writing guidance
+# =============================================================================
+
+
+class ThesisGuideInput(BaseModel):
+    """Get thesis writing guidance."""
+    section: str = Field(
+        description="Thesis section: 'introduction', 'literature_review', 'methods', 'results', "
+        "'discussion', 'conclusion', 'abstract', 'acknowledgements', or 'all' for overview"
+    )
+
+
+@mcp.tool()
+async def get_thesis_guide(params: ThesisGuideInput) -> str:
+    """Get writing guidance for each section of a chemistry thesis or dissertation. Covers: introduction, literature review, methods/experimental, results, discussion, conclusion, abstract, and acknowledgements. For each section: purpose, structure, writing tips, and common mistakes to avoid."""
+    if params.section.lower() == "all":
+        sections = ["abstract", "introduction", "literature_review", "methods",
+                     "results", "discussion", "conclusion", "acknowledgements"]
+        lines = ["## Thesis Writing Guide — Section Overview\n"]
+        for s in sections:
+            guide = _get_thesis_guide(s)
+            if guide:
+                lines.append(f"**{guide.get('name', s.replace('_', ' ').title())}** — {guide.get('purpose', '')}")
+        lines.append("\nRequest a specific section for detailed guidance.")
+        return "\n".join(lines)
+    result = _get_thesis_guide(params.section)
+    if result is None:
+        return f"No guide found for '{params.section}'. Available: introduction, literature_review, methods, results, discussion, conclusion, abstract, acknowledgements."
+    lines = [f"## {result.get('name', params.section.replace('_', ' ').title())}"]
+    if result.get("purpose"):
+        lines.append(f"\n**Purpose:** {result['purpose']}")
+    if result.get("structure"):
+        lines.append("\n**Structure:**")
+        for s in result["structure"]:
+            if isinstance(s, dict):
+                lines.append(f"  {s.get('order', '')}. **{s.get('name', '')}** — {s.get('content', '')}")
+            else:
+                lines.append(f"  • {s}")
+    if result.get("tips"):
+        lines.append("\n**Tips:**")
+        for tip in result["tips"]:
+            lines.append(f"  • {tip}")
+    if result.get("common_mistakes"):
+        lines.append("\n**Common mistakes:**")
+        for m in result["common_mistakes"]:
+            lines.append(f"  ✗ {m}")
     return "\n".join(lines)
 
 

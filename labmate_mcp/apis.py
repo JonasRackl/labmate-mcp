@@ -22,7 +22,7 @@ logger = logging.getLogger("scholarly-mcp")
 # Configuration (from environment variables)
 # =============================================================================
 
-VERSION = "3.0.0"
+VERSION = "7.0.0"
 USER_AGENT = (
     f"scholarly-mcp/{VERSION} "
     "(https://github.com/JonasRackl/chemrxiv-mcp; "
@@ -978,6 +978,253 @@ async def rxn_retrosynthesis(product_smiles: str, max_steps: int = 3) -> dict | 
         f"{RXN_BASE}/retrosynthesis/{pred_id}?projectId={project_id}",
         max_wait=120,
         interval=5,
+    )
+
+
+async def rxn_paragraph_to_actions(paragraph: str) -> dict | None:
+    """Convert experimental paragraph to structured action steps.
+
+    Uses IBM RXN NLP model to parse free-text experimental procedures
+    into machine-readable action steps (MAKESOLUTION, ADD, STIR, etc.).
+    """
+    if not RXN_API_KEY:
+        return None
+    data = await _post(
+        f"{RXN_BASE}/paragraph-actions",
+        json_data={"paragraph": paragraph},
+        headers=await _rxn_headers(),
+    )
+    return data
+
+
+async def rxn_predict_atom_mapping(rxn_smiles: str) -> dict | None:
+    """Predict atom-to-atom mapping for a reaction SMILES.
+
+    rxn_smiles: full reaction SMILES (e.g., 'CC(=O)O.OCC>>CC(=O)OCC.O')
+    Uses the atom-mapping-2020 AI model.
+    """
+    if not RXN_API_KEY:
+        return None
+    project_id = await _rxn_ensure_project()
+    if not project_id:
+        return None
+    data = await _post(
+        f"{RXN_BASE}/predictions",
+        json_data={
+            "projectId": project_id,
+            "name": "mcp-atom-mapping",
+            "inputs": [{"rxnSmiles": rxn_smiles}],
+            "aiModel": "atom-mapping-2020",
+        },
+        headers=await _rxn_headers(),
+    )
+    if not data or not data.get("payload"):
+        return data
+    pred_id = data["payload"].get("id")
+    if not pred_id:
+        return data
+    return await _rxn_poll(
+        f"{RXN_BASE}/predictions/{pred_id}",
+    )
+
+
+async def rxn_synthesis_plan(
+    prediction_id: str,
+    sequence_index: int = 0,
+) -> dict | None:
+    """Create and retrieve a synthesis plan from a retrosynthesis result.
+
+    Takes a retrosynthesis prediction ID and sequence index, creates a
+    synthesis, then retrieves the step-by-step procedure with actions.
+    """
+    if not RXN_API_KEY:
+        return None
+    project_id = await _rxn_ensure_project()
+    if not project_id:
+        return None
+    headers = await _rxn_headers()
+
+    # Step 1: Get the retrosynthesis result to find sequence IDs
+    retro_data = await _get(
+        f"{RXN_BASE}/retrosynthesis/{prediction_id}?projectId={project_id}",
+        headers=headers,
+    )
+    if not retro_data:
+        return {"error": "Could not retrieve retrosynthesis result"}
+
+    payload = retro_data.get("payload", {})
+    sequences = payload.get("sequences", [])
+    if not sequences:
+        return {"error": "No synthesis sequences found in retrosynthesis result"}
+    if sequence_index >= len(sequences):
+        return {"error": f"Sequence index {sequence_index} out of range (have {len(sequences)})"}
+
+    sequence = sequences[sequence_index]
+    sequence_id = sequence.get("sequenceId", sequence.get("id", ""))
+    if not sequence_id:
+        return {"error": "Could not extract sequence ID from retrosynthesis result", "sequence": sequence}
+
+    # Step 2: Create synthesis from sequence
+    synth_data = await _post(
+        f"{RXN_BASE}/syntheses",
+        json_data={
+            "sequenceId": sequence_id,
+            "projectId": project_id,
+        },
+        headers=headers,
+    )
+    if not synth_data or not synth_data.get("payload"):
+        return {"error": "Failed to create synthesis", "detail": synth_data}
+    synthesis_id = synth_data["payload"].get("id", "")
+    if not synthesis_id:
+        return {"error": "No synthesis ID returned"}
+
+    # Step 3: Poll for synthesis completion, then get procedure
+    synth_result = await _rxn_poll(
+        f"{RXN_BASE}/syntheses/{synthesis_id}?projectId={project_id}",
+        max_wait=90,
+        interval=5,
+    )
+    if not synth_result:
+        return {"error": "Synthesis planning timed out"}
+
+    # Step 4: Get detailed procedure
+    procedure = await _get(
+        f"{RXN_BASE}/syntheses/{synthesis_id}/procedure?projectId={project_id}",
+        headers=headers,
+    )
+
+    return {
+        "synthesis_id": synthesis_id,
+        "plan": synth_result,
+        "procedure": procedure,
+        "sequence_index": sequence_index,
+        "total_sequences": len(sequences),
+    }
+
+
+# =============================================================================
+# Rowan Science — Cloud computational chemistry (optional)
+# Requires: ROWAN_API_KEY + rowan-python package
+# =============================================================================
+
+ROWAN_API_KEY: str | None = os.environ.get("ROWAN_API_KEY")
+
+try:
+    import rowan as _rowan_sdk
+    import stjames as _stjames
+    _ROWAN_SDK = True
+except ImportError:
+    _ROWAN_SDK = False
+
+
+def rowan_available() -> bool:
+    """Check if Rowan Science API key AND SDK are configured."""
+    return bool(ROWAN_API_KEY) and _ROWAN_SDK
+
+
+async def _rowan_run_workflow(submit_fn, **kwargs) -> dict | None:
+    """Submit a Rowan workflow, wait for result, return data dict.
+
+    Runs the synchronous Rowan SDK in a thread pool to avoid blocking
+    the async event loop. Returns workflow.data or error info.
+    """
+    if not rowan_available():
+        return None
+
+    def _run():
+        _rowan_sdk.api_key = ROWAN_API_KEY
+        result = submit_fn(**kwargs)
+        result.wait_for_result()
+        result.fetch_latest(in_place=True)
+        return {
+            "status": str(result.status),
+            "data": result.data,
+            "credits_charged": result.credits_charged,
+            "workflow_uuid": result.uuid,
+            "workflow_type": result.workflow_type,
+            "elapsed": result.elapsed,
+        }
+
+    try:
+        return await asyncio.to_thread(_run)
+    except Exception as e:
+        logger.warning(f"Rowan workflow failed: {e}")
+        return {"error": str(e)}
+
+
+async def rowan_predict_pka(
+    smiles: str,
+    pka_range: tuple[int, int] = (2, 12),
+    method: str = "aimnet2_wagen2024",
+) -> dict | None:
+    """Predict pKa values for a molecule using Rowan Science."""
+    return await _rowan_run_workflow(
+        _rowan_sdk.submit_pka_workflow,
+        initial_molecule=smiles,
+        pka_range=pka_range,
+        method=method,
+        name="labmate-pka",
+    )
+
+
+async def rowan_predict_solubility(
+    smiles: str,
+    method: str = "fastsolv",
+    solvents: list[str] | None = None,
+    temperatures: list[float] | None = None,
+) -> dict | None:
+    """Predict solubility using Rowan Science."""
+    return await _rowan_run_workflow(
+        _rowan_sdk.submit_solubility_workflow,
+        initial_smiles=smiles,
+        solubility_method=method,
+        solvents=solvents,
+        temperatures=temperatures,
+        name="labmate-solubility",
+    )
+
+
+async def rowan_predict_admet(smiles: str) -> dict | None:
+    """Predict ADMET properties using Rowan Science."""
+    return await _rowan_run_workflow(
+        _rowan_sdk.submit_admet_workflow,
+        initial_smiles=smiles,
+        name="labmate-admet",
+    )
+
+
+async def rowan_search_tautomers(smiles: str) -> dict | None:
+    """Enumerate and rank tautomers using Rowan Science."""
+    mol = _stjames.Molecule.from_smiles(smiles)
+    return await _rowan_run_workflow(
+        _rowan_sdk.submit_tautomer_search_workflow,
+        initial_molecule=mol,
+        name="labmate-tautomers",
+    )
+
+
+async def rowan_compute_descriptors(smiles: str) -> dict | None:
+    """Compute molecular descriptors using Rowan Science."""
+    mol = _stjames.Molecule.from_smiles(smiles)
+    return await _rowan_run_workflow(
+        _rowan_sdk.submit_descriptors_workflow,
+        initial_molecule=mol,
+        name="labmate-descriptors",
+    )
+
+
+async def rowan_predict_nmr(
+    smiles: str,
+    solvent: str = "chloroform",
+) -> dict | None:
+    """Predict NMR chemical shifts using Rowan Science."""
+    mol = _stjames.Molecule.from_smiles(smiles)
+    return await _rowan_run_workflow(
+        _rowan_sdk.submit_nmr_workflow,
+        initial_molecule=mol,
+        solvent=solvent,
+        name="labmate-nmr",
     )
 
 
