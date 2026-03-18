@@ -12,6 +12,7 @@
 [![Downloads](https://img.shields.io/pypi/dm/labmate-mcp?style=flat-square&color=3572A5&label=Downloads)](https://pypi.org/project/labmate-mcp/)
 [![Python](https://img.shields.io/badge/Python-3.10+-3572A5?style=flat-square)](https://python.org)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
+[![AgentSeal MCP](https://agentseal.org/api/v1/mcp/labmate-mcp/badge)](https://agentseal.org/mcp/labmate-mcp)
 
 <br>
 
